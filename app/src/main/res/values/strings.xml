@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">MatrixSolver</string>
+
+    <!-- Main Activity -->
+    <string name="basic_operations">Phép toán cơ bản</string>
+    <string name="advanced_operations">Phép toán nâng cao</string>
+    <string name="recent_calculations">Tính toán gần đây</string>
+    <string name="no_recent_calculations">Chưa có tính toán nào</string>
+    <string name="quick_action">Thao tác nhanh</string>
+
+    <!-- Bottom Navigation -->
+    <string name="calculator">Tính toán</string>
+    <string name="theory">Lý thuyết</string>
+    <string name="history">Lịch sử</string>
+
+    <!-- Matrix Input Activity -->
+    <string name="matrix_input">Nhập ma trận</string>
+    <string name="matrix_dimensions">Kích thước ma trận</string>
+    <string name="rows">Số hàng</string>
+    <string name="columns">Số cột</string>
+    <string name="apply">Áp dụng</string>
+    <string name="matrix_values">Giá trị ma trận</string>
+    <string name="calculate">Tính toán</string>
+    <string name="matrix_a">Ma trận A</string>
+    <string name="matrix_b">Ma trận B</string>
+    <string name="second_matrix">Ma trận thứ hai</string>
+
+    <!-- Result Activity -->
+    <string name="result">Kết quả</string>
+    <string name="steps">Các bước</string>
+    <string name="share">Chia sẻ</string>
+
+    <!-- History Activity -->
+    <string name="no_history">Không có lịch sử tính toán</string>
+    <string name="clear_history">Xóa lịch sử</string>
+
+    <!-- Operation names -->
+    <string name="operation_add">Cộng ma trận</string>
+    <string name="operation_subtract">Trừ ma trận</string>
+    <string name="operation_multiply">Nhân ma trận</string>
+    <string name="operation_transpose">Chuyển vị</string>
+    <string name="operation_determinant">Định thức</string>
+    <string name="operation_inverse">Ma trận nghịch đảo</string>
+    <string name="operation_convolution">Tích chập</string>
+    <string name="operation_eigenvalues">Giá trị riêng</string>
+    <string name="operation_svd">Phân tích SVD</string>
+    <string name="operation_rank">Hạng ma trận</string>
+    <string name="operation_linear_system">Giải hệ phương trình</string>
+
+    <!-- Other UI Elements -->
+    <string name="operation_icon">Biểu tượng phép toán</string>
+    <string name="operation_title">Tiêu đề phép toán</string>
+</resources>
