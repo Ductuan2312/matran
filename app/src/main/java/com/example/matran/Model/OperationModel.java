@@ -254,6 +254,122 @@ public class OperationModel {
     }
 
     /**
+     * Calculate Singular Value Decomposition of a matrix
+     * @param matrix input matrix
+     * @return array of three matrices [U, S, V^T] representing the SVD
+     * @throws IllegalArgumentException if SVD computation fails
+     */
+    public static MatrixModel[] svd(MatrixModel matrix) {
+        int m = matrix.getRows();
+        int n = matrix.getColumns();
+
+        // Đối với trường hợp ma trận 2x2 đơn giản, tính SVD trực tiếp
+        if (m == 2 && n == 2) {
+            // Bước 1: Tính A^T * A (ma trận V sẽ chứa eigenvectors của A^T * A)
+            MatrixModel ata = multiply(transpose(matrix), matrix);
+
+            // Bước 2: Tính eigenvalues và eigenvectors của A^T * A
+            double a = ata.getValue(0, 0);
+            double b = ata.getValue(0, 1);
+            double c = ata.getValue(1, 0);
+            double d = ata.getValue(1, 1);
+
+            double trace = a + d;
+            double det = a * d - b * c;
+
+            double discriminant = trace * trace - 4 * det;
+
+            if (discriminant < 0) {
+                throw new IllegalArgumentException("Complex eigenvalues are not supported in SVD");
+            }
+
+            // Tính singular values (căn bậc 2 của eigenvalues)
+            double lambda1 = (trace + Math.sqrt(discriminant)) / 2.0;
+            double lambda2 = (trace - Math.sqrt(discriminant)) / 2.0;
+
+            double sigma1 = Math.sqrt(Math.max(lambda1, 0));
+            double sigma2 = Math.sqrt(Math.max(lambda2, 0));
+
+            // Tạo ma trận Σ (singular values)
+            MatrixModel S = new MatrixModel(m, n);
+            S.setValue(0, 0, sigma1);
+            if (m > 1 && n > 1) {
+                S.setValue(1, 1, sigma2);
+            }
+
+            // Tính eigenvectors cho V
+            MatrixModel V = new MatrixModel(n, n);
+
+            if (Math.abs(b) < 1e-10 && Math.abs(c) < 1e-10) {
+                // Nếu ma trận đã là đường chéo, V là ma trận đơn vị
+                V.setValue(0, 0, 1);
+                V.setValue(0, 1, 0);
+                V.setValue(1, 0, 0);
+                V.setValue(1, 1, 1);
+            } else {
+                double v1x, v1y, v2x, v2y;
+
+                // Eigenvector đầu tiên
+                if (Math.abs(b) > 1e-10) {
+                    v1x = lambda1 - d;
+                    v1y = c;
+                } else {
+                    v1x = b;
+                    v1y = lambda1 - a;
+                }
+
+                // Eigenvector thứ hai
+                if (Math.abs(b) > 1e-10) {
+                    v2x = lambda2 - d;
+                    v2y = c;
+                } else {
+                    v2x = b;
+                    v2y = lambda2 - a;
+                }
+
+                // Chuẩn hóa eigenvectors
+                double norm1 = Math.sqrt(v1x * v1x + v1y * v1y);
+                if (norm1 > 1e-10) {
+                    v1x /= norm1;
+                    v1y /= norm1;
+                }
+
+                double norm2 = Math.sqrt(v2x * v2x + v2y * v2y);
+                if (norm2 > 1e-10) {
+                    v2x /= norm2;
+                    v2y /= norm2;
+                }
+
+                V.setValue(0, 0, v1x);
+                V.setValue(1, 0, v1y);
+                V.setValue(0, 1, v2x);
+                V.setValue(1, 1, v2y);
+            }
+
+            // Tính U = A * V * S^-1
+            MatrixModel Vt = transpose(V);
+
+            // Tạo ma trận S^-1 (nghịch đảo của ma trận đường chéo S)
+            MatrixModel SInv = new MatrixModel(n, m);
+            if (Math.abs(sigma1) > 1e-10) {
+                SInv.setValue(0, 0, 1.0 / sigma1);
+            }
+            if (m > 1 && n > 1 && Math.abs(sigma2) > 1e-10) {
+                SInv.setValue(1, 1, 1.0 / sigma2);
+            }
+
+            // U = A * V * S^-1
+            MatrixModel U = multiply(multiply(matrix, V), SInv);
+
+            // Trả về kết quả [U, S, V^T]
+            return new MatrixModel[] { U, S, Vt };
+        }
+
+        // Cho ma trận lớn hơn hoặc trường hợp tổng quát, cần thuật toán phức tạp hơn
+        throw new UnsupportedOperationException("SVD for matrices larger than 2x2 is not implemented");
+    }
+
+    /**
      * Calculate eigenvalues of a square matrix
      * @param matrix input square matrix
      * @return matrix containing eigenvalues on the diagonal

@@ -12,6 +12,10 @@ public class CalculationRecord implements Serializable {
     private MatrixModel inputMatrixB;  // Nullable for operations with single input
     private MatrixModel resultMatrix;
     private Date timestamp;
+    private MatrixModel matrixU;
+    private MatrixModel matrixS;
+    private MatrixModel matrixVT;
+    private boolean isSVDResult;
 
     /**
      * Constructor for operations with one input matrix
@@ -27,6 +31,18 @@ public class CalculationRecord implements Serializable {
         this.timestamp = new Date();
     }
 
+    // Constructor cho kết quả SVD
+    public CalculationRecord(String operationType, MatrixModel inputMatrixA, MatrixModel matrixU, MatrixModel matrixS, MatrixModel matrixVT) {
+        this.operationType = operationType;
+        this.inputMatrixA = inputMatrixA;
+        this.matrixU = matrixU;
+        this.matrixS = matrixS;
+        this.matrixVT = matrixVT;
+        this.resultMatrix = matrixS; // Sử dụng ma trận S làm resultMatrix chính
+        this.isSVDResult = true;
+        this.timestamp = new Date();
+    }
+
     /**
      * Constructor for operations with two input matrices
      * @param operationType type of operation performed
@@ -34,13 +50,30 @@ public class CalculationRecord implements Serializable {
      * @param inputMatrixB second input matrix
      * @param resultMatrix result matrix
      */
-    public CalculationRecord(String operationType, MatrixModel inputMatrixA, 
+    public CalculationRecord(String operationType, MatrixModel inputMatrixA,
                              MatrixModel inputMatrixB, MatrixModel resultMatrix) {
         this.operationType = operationType;
         this.inputMatrixA = inputMatrixA;
         this.inputMatrixB = inputMatrixB;
         this.resultMatrix = resultMatrix;
         this.timestamp = new Date();
+    }
+
+    // Các getters mới
+    public MatrixModel getMatrixU() {
+        return matrixU;
+    }
+
+    public MatrixModel getMatrixS() {
+        return matrixS;
+    }
+
+    public MatrixModel getMatrixVT() {
+        return matrixVT;
+    }
+
+    public boolean isSVDResult() {
+        return isSVDResult;
     }
 
     /**
@@ -97,10 +130,10 @@ public class CalculationRecord implements Serializable {
      */
     @Override
     public String toString() {
-        return operationType + " (" + 
-               inputMatrixA.getRows() + "x" + inputMatrixA.getColumns() + ")" +
-               (hasTwoInputs() ? " with (" + inputMatrixB.getRows() + "x" + 
-                                 inputMatrixB.getColumns() + ")" : "") +
-               " → (" + resultMatrix.getRows() + "x" + resultMatrix.getColumns() + ")";
+        return operationType + " (" +
+                inputMatrixA.getRows() + "x" + inputMatrixA.getColumns() + ")" +
+                (hasTwoInputs() ? " with (" + inputMatrixB.getRows() + "x" +
+                        inputMatrixB.getColumns() + ")" : "") +
+                " → (" + resultMatrix.getRows() + "x" + resultMatrix.getColumns() + ")";
     }
 }

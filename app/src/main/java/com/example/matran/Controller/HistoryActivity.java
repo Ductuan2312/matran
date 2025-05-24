@@ -163,21 +163,30 @@ public class HistoryActivity extends AppCompatActivity {
             
             return view;
         }
-        
+
         private String formatDimensions(CalculationRecord record) {
             StringBuilder sb = new StringBuilder();
-            
+
             MatrixModel matrixA = record.getInputMatrixA();
             sb.append("(").append(matrixA.getRows()).append("×").append(matrixA.getColumns()).append(")");
-            
+
             if (record.hasTwoInputs()) {
                 MatrixModel matrixB = record.getInputMatrixB();
                 sb.append(" → (").append(matrixB.getRows()).append("×").append(matrixB.getColumns()).append(")");
             }
-            
+
             MatrixModel resultMatrix = record.getResultMatrix();
-            sb.append(" = (").append(resultMatrix.getRows()).append("×").append(resultMatrix.getColumns()).append(")");
-            
+            // Kiểm tra null trước khi truy cập
+            if (resultMatrix != null) {
+                sb.append(" = (").append(resultMatrix.getRows()).append("×").append(resultMatrix.getColumns()).append(")");
+            } else if (record.isSVDResult()) {
+                // Nếu là kết quả SVD, sử dụng ma trận S làm kết quả
+                MatrixModel matrixS = record.getMatrixS();
+                sb.append(" = (").append(matrixS.getRows()).append("×").append(matrixS.getColumns()).append(")");
+            } else {
+                sb.append(" = (unknown)");
+            }
+
             return sb.toString();
         }
     }
