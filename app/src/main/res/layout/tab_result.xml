@@ -89,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?attr/textAppearanceHeadline5"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="@color/black"
             android:gravity="center"
             android:layout_marginTop="16dp"
             android:visibility="gone"
