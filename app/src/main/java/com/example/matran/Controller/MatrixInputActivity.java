@@ -303,6 +303,10 @@ public class MatrixInputActivity extends AppCompatActivity {
                     scalarResult = OperationModel.determinant(matrixA);
                     isScalarResult = true;
                     break;
+                // Thêm case cho EIGENVALUES:
+                case "EIGENVALUES":
+                    result = OperationModel.eigenvalues(matrixA);
+                    break;
                 case "INVERSE":
                     result = OperationModel.inverse(matrixA);
                     break;

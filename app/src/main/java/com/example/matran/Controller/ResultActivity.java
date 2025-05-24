@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -91,10 +93,10 @@ public class ResultActivity extends AppCompatActivity {
     private void showResultTab() {
         // Clear current content
         tabContent.removeAllViews();
-        
+
         // Inflate result view
         View resultView = getLayoutInflater().inflate(R.layout.tab_result, tabContent, false);
-        
+
         TextView operationTitleText = resultView.findViewById(R.id.operation_title);
         TextView matrixALabel = resultView.findViewById(R.id.matrix_a_label);
         TableLayout matrixATable = resultView.findViewById(R.id.matrix_a_table);
@@ -103,21 +105,23 @@ public class ResultActivity extends AppCompatActivity {
         TextView resultLabel = resultView.findViewById(R.id.result_label);
         TableLayout resultTable = resultView.findViewById(R.id.result_table);
         TextView scalarResultText = resultView.findViewById(R.id.scalar_result_text);
-        
+
         // Set operation title
         operationTitleText.setText(calculationRecord.getOperationType());
-        
+
         // Display Matrix A
         displayMatrix(calculationRecord.getInputMatrixA(), matrixATable);
-        
+
         // Display Matrix B if it exists
-        if (calculationRecord.hasTwoInputs()) {
+        if (calculationRecord.getInputMatrixB() != null) {
+            matrixBLabel.setVisibility(View.VISIBLE);
+            matrixBTable.setVisibility(View.VISIBLE);
             displayMatrix(calculationRecord.getInputMatrixB(), matrixBTable);
         } else {
             matrixBLabel.setVisibility(View.GONE);
             matrixBTable.setVisibility(View.GONE);
         }
-        
+
         // Display result
         if (isScalarResult) {
             resultTable.setVisibility(View.GONE);
@@ -127,9 +131,44 @@ public class ResultActivity extends AppCompatActivity {
             resultTable.setVisibility(View.VISIBLE);
             scalarResultText.setVisibility(View.GONE);
             displayMatrix(calculationRecord.getResultMatrix(), resultTable);
+
+            // Thêm phần hiển thị trị riêng phía dưới ma trận kết quả nếu là phép tính trị riêng
+            if (calculationRecord.getOperationType().equals("Trị Riêng")) {
+                // Tìm LinearLayout chính trong ScrollView
+                LinearLayout mainContainer = (LinearLayout) ((ScrollView) resultView).getChildAt(0);
+
+                // Tạo TextView để hiển thị tiêu đề giải thích
+                TextView eigenvalueTitle = new TextView(this);
+                eigenvalueTitle.setText("Các trị riêng là các giá trị nằm trên đường chéo chính của ma trận kết quả:");
+                eigenvalueTitle.setTextAppearance(this, android.R.style.TextAppearance_Medium);
+                eigenvalueTitle.setPadding(0, 32, 0, 16);
+                mainContainer.addView(eigenvalueTitle);
+
+                // Tạo container cho các giá trị trị riêng
+                LinearLayout eigenvaluesContainer = new LinearLayout(this);
+                eigenvaluesContainer.setOrientation(LinearLayout.VERTICAL);
+                eigenvaluesContainer.setPadding(32, 0, 0, 16);
+
+                // Thêm thông tin từng trị riêng
+                MatrixModel result = calculationRecord.getResultMatrix();
+                int n = Math.min(result.getRows(), result.getColumns());
+
+                for (int i = 0; i < n; i++) {
+                    double eigenvalue = result.getValue(i, i);
+                    if (Math.abs(eigenvalue) > 1e-10) { // Chỉ hiển thị trị riêng khác 0
+                        TextView eigenvalueText = new TextView(this);
+                        eigenvalueText.setText(String.format("λ%d = %.2f", i+1, eigenvalue));
+                        eigenvalueText.setTextAppearance(this, android.R.style.TextAppearance_Medium);
+                        eigenvalueText.setPadding(0, 8, 0, 8);
+                        eigenvaluesContainer.addView(eigenvalueText);
+                    }
+                }
+
+                // Thêm container vào LinearLayout chính
+                mainContainer.addView(eigenvaluesContainer);
+            }
         }
-        
-        // Add view to container
+
         tabContent.addView(resultView);
     }
     

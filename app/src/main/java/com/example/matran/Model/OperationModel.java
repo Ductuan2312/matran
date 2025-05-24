@@ -154,25 +154,29 @@ public class OperationModel {
     public static MatrixModel convolution(MatrixModel matrix, MatrixModel kernel) {
         int resultRows = matrix.getRows() - kernel.getRows() + 1;
         int resultCols = matrix.getColumns() - kernel.getColumns() + 1;
-        
+
         if (resultRows <= 0 || resultCols <= 0) {
             throw new IllegalArgumentException("Kernel size must be smaller than matrix size");
         }
-        
+
         MatrixModel result = new MatrixModel(resultRows, resultCols);
-        
+
         for (int i = 0; i < resultRows; i++) {
             for (int j = 0; j < resultCols; j++) {
                 double sum = 0;
                 for (int ki = 0; ki < kernel.getRows(); ki++) {
                     for (int kj = 0; kj < kernel.getColumns(); kj++) {
-                        sum += matrix.getValue(i + ki, j + kj) * kernel.getValue(ki, kj);
+                        // Lật kernel 180 độ bằng cách đảo ngược chỉ số
+                        int flippedRowIndex = kernel.getRows() - 1 - ki;
+                        int flippedColIndex = kernel.getColumns() - 1 - kj;
+
+                        sum += matrix.getValue(i + ki, j + kj) * kernel.getValue(flippedRowIndex, flippedColIndex);
                     }
                 }
                 result.setValue(i, j, sum);
             }
         }
-        
+
         return result;
     }
     
@@ -248,7 +252,66 @@ public class OperationModel {
         
         return subMatrix;
     }
-    
+
+    /**
+     * Calculate eigenvalues of a square matrix
+     * @param matrix input square matrix
+     * @return matrix containing eigenvalues on the diagonal
+     * @throws IllegalArgumentException if matrix is not square
+     */
+    public static MatrixModel eigenvalues(MatrixModel matrix) {
+        if (matrix.getRows() != matrix.getColumns()) {
+            throw new IllegalArgumentException("Eigenvalues can only be calculated for square matrices");
+        }
+
+        int n = matrix.getRows();
+
+        // Đối với ma trận 1x1
+        if (n == 1) {
+            MatrixModel result = new MatrixModel(1, 1);
+            result.setValue(0, 0, matrix.getValue(0, 0));
+            return result;
+        }
+
+        // Đối với ma trận 2x2
+        if (n == 2) {
+            double a = matrix.getValue(0, 0);
+            double b = matrix.getValue(0, 1);
+            double c = matrix.getValue(1, 0);
+            double d = matrix.getValue(1, 1);
+
+            double trace = a + d;
+            double det = a * d - b * c;
+
+            // Tính nghiệm của phương trình bậc hai: λ² - trace*λ + det = 0
+            double discriminant = trace * trace - 4 * det;
+
+            if (discriminant < 0) {
+                // Trị riêng phức (không hỗ trợ trong phiên bản này)
+                throw new IllegalArgumentException("Complex eigenvalues are not supported");
+            }
+
+            double lambda1 = (trace + Math.sqrt(discriminant)) / 2.0;
+            double lambda2 = (trace - Math.sqrt(discriminant)) / 2.0;
+
+            // Trả về ma trận đường chéo chứa các trị riêng
+            MatrixModel result = new MatrixModel(n, n);
+            result.setValue(0, 0, lambda1);
+            result.setValue(1, 1, lambda2);
+            return result;
+        }
+
+        // Đối với ma trận 3x3 (sử dụng phương pháp đơn giản hóa)
+        if (n == 3) {
+            // Triển khai phương pháp tính trị riêng cho ma trận 3x3
+            // Đây là một phương pháp tương đối phức tạp, có thể sử dụng thư viện bên ngoài
+            // Trong phiên bản hiện tại, ta sẽ chưa hỗ trợ
+            throw new UnsupportedOperationException("Eigenvalue calculation for 3x3 matrices is not implemented yet");
+        }
+
+        // Đối với ma trận lớn hơn
+        throw new UnsupportedOperationException("Eigenvalue calculation for matrices larger than 2x2 is not implemented");
+    }
     /**
      * Calculate Reduced Row Echelon Form (RREF) of matrix
      * @param matrix input matrix

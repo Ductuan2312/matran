@@ -42,6 +42,9 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation("org.mockito:mockito-core:5.8.0")
 
+    // UiAutomator để kiểm soát animations
+    androidTestImplementation ("androidx.test.uiautomator:uiautomator:2.3.0")
+
     // Android Testing
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
