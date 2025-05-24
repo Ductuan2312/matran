@@ -32,15 +32,22 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation("com.google.code.gson:gson:2.10.1")
+    // Thư viện tính toán ma trận
+    implementation("org.ejml:ejml-all:0.43")
+
+    // Testing dependencies
     testImplementation(libs.junit)
+    testImplementation("org.mockito:mockito-core:5.8.0")
+
+    // Android Testing
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-    implementation ("com.google.code.gson:gson:2.10.1")
-    // Thư viện tính toán ma trận (tuỳ chọn)
-    implementation ("org.ejml:ejml-all:0.43")
-
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("org.mockito:mockito-android:5.8.0")
 }

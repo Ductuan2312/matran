@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import com.example.matrixsolver.R;
+import com.example.matran.R;
 
 import java.util.List;
 import java.util.Map;

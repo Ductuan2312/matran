@@ -22,10 +22,10 @@
             android:id="@+id/basic_operations_grid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="2">
-            
+            android:columnCount="2"
+            android:useDefaultMargins="true"
+            android:alignmentMode="alignBounds">
             <!-- Các thẻ CardView cho các phép toán sẽ được thêm vào đây -->
-            
         </GridLayout>
 
         <View
@@ -46,10 +46,12 @@
             android:id="@+id/advanced_operations_grid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="2">
-            
+            android:columnCount="2"
+            android:useDefaultMargins="true"
+            android:alignmentMode="alignBounds">
+
             <!-- Các thẻ CardView cho các phép toán nâng cao sẽ được thêm vào đây -->
-            
+
         </GridLayout>
 
         <com.google.android.material.card.MaterialCardView
