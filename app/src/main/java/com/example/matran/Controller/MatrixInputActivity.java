@@ -20,6 +20,7 @@ import com.example.matran.Model.CalculationRecord;
 import com.example.matran.Model.HistoryModel;
 import com.example.matran.Model.MatrixModel;
 import com.example.matran.Model.OperationModel;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class MatrixInputActivity extends AppCompatActivity {
@@ -36,10 +37,15 @@ public class MatrixInputActivity extends AppCompatActivity {
     private TableLayout secondMatrixInputTable;
     private TextView secondMatrixLabel;
 
+    // For constants vector (right-hand side of linear system)
+    private MaterialCardView constantsCard;
+    private TableLayout constantsInputTable;
+
     // Operation info
     private String operationType;
     private String operationTitle;
     private boolean needsSecondMatrix = false;
+    private boolean isLinearSystem = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +68,16 @@ public class MatrixInputActivity extends AppCompatActivity {
         secondMatrixInputTable = findViewById(R.id.second_matrix_input_table);
         secondMatrixLabel = findViewById(R.id.second_matrix_label);
 
+        // Components for constants vector
+        constantsCard = findViewById(R.id.constants_card);
+        constantsInputTable = findViewById(R.id.constants_input_table);
+
         // Set toolbar
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(operationTitle != null ? operationTitle : "Matrix Input");
 
-        // Determine if we need a second matrix
+        // Determine if we need a second matrix or constants vector
         determineOperationType();
 
         // Set up button listeners
@@ -78,7 +88,7 @@ public class MatrixInputActivity extends AppCompatActivity {
         createMatrixInputFields(3, 3);
 
         // Create second matrix input fields if needed
-        if (needsSecondMatrix) {
+        if (needsSecondMatrix && !isLinearSystem) {
             createSecondMatrixInputFields(3, 3);
         } else {
             // Hide second matrix UI elements
@@ -88,6 +98,14 @@ public class MatrixInputActivity extends AppCompatActivity {
             if (secondMatrixLabel != null) {
                 secondMatrixLabel.setVisibility(View.GONE);
             }
+        }
+
+        // Create constants vector input fields if needed
+        if (isLinearSystem) {
+            constantsCard.setVisibility(View.VISIBLE);
+            createConstantsInputFields(3);
+        } else {
+            constantsCard.setVisibility(View.GONE);
         }
     }
 
@@ -105,9 +123,15 @@ public class MatrixInputActivity extends AppCompatActivity {
             case "MULTIPLY":
             case "CONVOLUTION":
                 needsSecondMatrix = true;
+                isLinearSystem = false;
+                break;
+            case "LINEAR_SYSTEM":
+                isLinearSystem = true;
+                needsSecondMatrix = false; // Sẽ sử dụng bảng nhập riêng cho vế phải
                 break;
             default:
                 needsSecondMatrix = false;
+                isLinearSystem = false;
         }
     }
 
@@ -136,7 +160,7 @@ public class MatrixInputActivity extends AppCompatActivity {
             createMatrixInputFields(rows, columns);
 
             // Create second matrix if needed
-            if (needsSecondMatrix) {
+            if (needsSecondMatrix && !isLinearSystem) {
                 int rows2 = rows;
                 int cols2 = columns;
 
@@ -146,6 +170,16 @@ public class MatrixInputActivity extends AppCompatActivity {
                 }
 
                 createSecondMatrixInputFields(rows2, cols2);
+            }
+
+            // Create constants vector if needed for linear system
+            if (isLinearSystem) {
+                if (rows != columns) {
+                    Toast.makeText(this, "For linear system, matrix must be square (number of equations = number of unknowns)", Toast.LENGTH_LONG).show();
+                    columnsInput.setText(String.valueOf(rows));
+                    columns = rows;
+                }
+                createConstantsInputFields(rows);
             }
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Please enter valid numbers", Toast.LENGTH_SHORT).show();
@@ -230,6 +264,69 @@ public class MatrixInputActivity extends AppCompatActivity {
     }
 
     /**
+     * Create constants vector input fields (RHS of linear system)
+     */
+    private void createConstantsInputFields(int rows) {
+        if (constantsInputTable == null) return;
+
+        constantsInputTable.removeAllViews();
+
+        for (int i = 0; i < rows; i++) {
+            TableRow tableRow = new TableRow(this);
+            tableRow.setLayoutParams(new TableLayout.LayoutParams(
+                    TableLayout.LayoutParams.MATCH_PARENT,
+                    TableLayout.LayoutParams.WRAP_CONTENT));
+
+            // Only one column for constants vector
+            EditText editText = new EditText(this);
+            editText.setTag("constant_" + i);
+            editText.setHint("0");
+            editText.setText("0");
+            editText.setTextSize(14);
+            editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
+                    | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+                    | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+            TableRow.LayoutParams params = new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT);
+            params.setMargins(5, 5, 5, 5);
+            editText.setLayoutParams(params);
+
+            tableRow.addView(editText);
+            constantsInputTable.addView(tableRow);
+        }
+    }
+
+    /**
+     * Read constants vector from input fields
+     */
+    private MatrixModel readConstantsFromInputs() {
+        try {
+            int rows = constantsInputTable.getChildCount();
+            if (rows == 0) return null;
+
+            MatrixModel constants = new MatrixModel(rows, 1); // Vector vế phải luôn có 1 cột
+
+            for (int i = 0; i < rows; i++) {
+                TableRow row = (TableRow) constantsInputTable.getChildAt(i);
+                EditText cell = (EditText) row.getChildAt(0); // Chỉ có 1 phần tử trong mỗi hàng
+                String value = cell.getText().toString();
+                if (TextUtils.isEmpty(value) || value.equals("-")) {
+                    constants.setValue(i, 0, 0);
+                } else {
+                    constants.setValue(i, 0, Double.parseDouble(value));
+                }
+            }
+
+            return constants;
+        } catch (Exception e) {
+            Toast.makeText(this, "Error reading constants: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
+    /**
      * Read matrix from input fields
      */
     private MatrixModel readMatrixFromInputs(boolean isSecondMatrix) {
@@ -271,13 +368,21 @@ public class MatrixInputActivity extends AppCompatActivity {
         MatrixModel matrixA = readMatrixFromInputs(false);
         MatrixModel matrixB = needsSecondMatrix ? readMatrixFromInputs(true) : null;
 
+        // Read constants for linear system
+        MatrixModel constants = isLinearSystem ? readConstantsFromInputs() : null;
+
         if (matrixA == null) {
             Toast.makeText(this, "Error reading matrix values", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (needsSecondMatrix && matrixB == null) {
+        if (needsSecondMatrix && matrixB == null && !isLinearSystem) {
             Toast.makeText(this, "Error reading second matrix values", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (isLinearSystem && constants == null) {
+            Toast.makeText(this, "Error reading constants vector", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -287,7 +392,7 @@ public class MatrixInputActivity extends AppCompatActivity {
             double scalarResult = 0;
             boolean isScalarResult = false;
             boolean isSVDResult = false;
-            MatrixModel[] svdMatrices = null;  // Thêm biến để lưu kết quả SVD
+            MatrixModel[] svdMatrices = null;
 
             switch (operationType) {
                 case "ADD":
@@ -306,7 +411,6 @@ public class MatrixInputActivity extends AppCompatActivity {
                     scalarResult = OperationModel.determinant(matrixA);
                     isScalarResult = true;
                     break;
-                // Thêm case cho EIGENVALUES:
                 case "EIGENVALUES":
                     result = OperationModel.eigenvalues(matrixA);
                     break;
@@ -318,16 +422,16 @@ public class MatrixInputActivity extends AppCompatActivity {
                     break;
                 case "SVD":
                     svdMatrices = OperationModel.svd(matrixA);
-                    isSVDResult = true;  // Đánh dấu đây là kết quả SVD
-                    result = svdMatrices[1];  // Dùng ma trận S làm kết quả mặc định
+                    isSVDResult = true;
+                    result = svdMatrices[1];
                     break;
                 case "RANK":
                     scalarResult = OperationModel.rank(matrixA);
                     isScalarResult = true;
                     break;
                 case "LINEAR_SYSTEM":
-                    // Assuming matrixB contains the constants
-                    result = OperationModel.solveLinearSystem(matrixA, matrixB);
+                    // Sử dụng matrixA và constants
+                    result = OperationModel.solveLinearSystem(matrixA, constants);
                     break;
                 default:
                     // Just show the input matrix
@@ -346,16 +450,9 @@ public class MatrixInputActivity extends AppCompatActivity {
                         svdMatrices[1], // Ma trận S
                         svdMatrices[2]  // Ma trận V^T
                 );
-
-                // Lưu vào lịch sử
-                HistoryModel historyModel = new HistoryModel(this);
-                historyModel.addRecord(record);
-
-                // Chuyển đến ResultActivity với record
-                Intent intent = new Intent(this, ResultActivity.class);
-                intent.putExtra("calculation_record", record);
-                startActivity(intent);
-                return;
+            } else if (isLinearSystem) {
+                // Cho hệ phương trình tuyến tính
+                record = new CalculationRecord(operationTitle, matrixA, constants, result);
             } else if (needsSecondMatrix) {
                 if (isScalarResult) {
                     // Create a 1x1 matrix to hold scalar result
@@ -385,6 +482,7 @@ public class MatrixInputActivity extends AppCompatActivity {
             intent.putExtra("calculation_record", record);
             intent.putExtra("is_scalar_result", isScalarResult);
             intent.putExtra("scalar_result", scalarResult);
+            intent.putExtra("is_linear_system", isLinearSystem);
             startActivity(intent);
 
         } catch (IllegalArgumentException e) {

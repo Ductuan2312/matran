@@ -35,6 +35,8 @@
     <string name="clear_history">Xóa lịch sử</string>
 
     <!-- Operation names -->
+    <string name="constants">Vế phải (b,phần kết quả của phương trình)</string>
+    <string name="linear_system_result">Nghiệm của hệ phương trình tuyến tính</string>
     <string name="operation_add">Cộng ma trận</string>
     <string name="operation_subtract">Trừ ma trận</string>
     <string name="operation_multiply">Nhân ma trận</string>

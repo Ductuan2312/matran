@@ -253,6 +253,37 @@ public class ResultActivity extends AppCompatActivity {
 
                 mainContainer.addView(svContainer);
             }
+
+            // Nếu là kết quả của hệ phương trình tuyến tính
+            if (getIntent().getBooleanExtra("is_linear_system", false)) {
+                // Tìm LinearLayout chính trong ScrollView
+                LinearLayout mainContainer = (LinearLayout) ((ScrollView) resultView).getChildAt(0);
+
+                // Tạo TextView để hiển thị tiêu đề giải thích
+                TextView linearSystemTitle = new TextView(this);
+                linearSystemTitle.setText("Nghiệm của hệ phương trình tuyến tính:");
+                linearSystemTitle.setTextAppearance(this, android.R.style.TextAppearance_Medium);
+                linearSystemTitle.setPadding(0, 32, 0, 16);
+                mainContainer.addView(linearSystemTitle);
+
+                // Tạo container cho các giá trị nghiệm
+                LinearLayout solutionContainer = new LinearLayout(this);
+                solutionContainer.setOrientation(LinearLayout.VERTICAL);
+                solutionContainer.setPadding(32, 0, 0, 16);
+
+                // Thêm thông tin từng nghiệm
+                MatrixModel result = calculationRecord.getResultMatrix();
+                for (int i = 0; i < result.getRows(); i++) {
+                    TextView solutionText = new TextView(this);
+                    solutionText.setText(String.format("x%d = %.4f", i+1, result.getValue(i, 0)));
+                    solutionText.setTextAppearance(this, android.R.style.TextAppearance_Medium);
+                    solutionText.setPadding(0, 8, 0, 8);
+                    solutionContainer.addView(solutionText);
+                }
+
+                // Thêm container vào LinearLayout chính
+                mainContainer.addView(solutionContainer);
+            }
         }
 
         tabContent.addView(resultView);
