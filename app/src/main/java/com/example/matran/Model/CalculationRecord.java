@@ -1,7 +1,9 @@
 package com.example.matran.Model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Model class to represent a single calculation record for history
@@ -17,6 +19,9 @@ public class CalculationRecord implements Serializable {
     private MatrixModel matrixVT;
     private boolean isSVDResult;
 
+    // Mảng lưu các bước tính toán
+    private List<CalculationStep> calculationSteps;
+
     /**
      * Constructor for operations with one input matrix
      * @param operationType type of operation performed
@@ -29,6 +34,7 @@ public class CalculationRecord implements Serializable {
         this.inputMatrixB = null;
         this.resultMatrix = resultMatrix;
         this.timestamp = new Date();
+        this.calculationSteps = new ArrayList<>();
     }
 
     // Constructor cho kết quả SVD
@@ -41,6 +47,7 @@ public class CalculationRecord implements Serializable {
         this.resultMatrix = matrixS; // Sử dụng ma trận S làm resultMatrix chính
         this.isSVDResult = true;
         this.timestamp = new Date();
+        this.calculationSteps = new ArrayList<>();
     }
 
     /**
@@ -57,6 +64,43 @@ public class CalculationRecord implements Serializable {
         this.inputMatrixB = inputMatrixB;
         this.resultMatrix = resultMatrix;
         this.timestamp = new Date();
+        this.calculationSteps = new ArrayList<>();
+    }
+
+    /**
+     * Thêm một bước tính toán
+     * @param description mô tả bước tính toán
+     * @param intermediateResult kết quả trung gian (có thể null)
+     */
+    public void addStep(String description, MatrixModel intermediateResult) {
+        if (calculationSteps == null) {
+            calculationSteps = new ArrayList<>();
+        }
+        calculationSteps.add(new CalculationStep(description, intermediateResult));
+    }
+
+    /**
+     * Thêm một bước tính toán chỉ có mô tả
+     * @param description mô tả bước tính toán
+     */
+    public void addStep(String description) {
+        addStep(description, null);
+    }
+
+    /**
+     * Lấy danh sách các bước tính toán
+     * @return danh sách các bước tính toán
+     */
+    public List<CalculationStep> getCalculationSteps() {
+        return calculationSteps;
+    }
+
+    /**
+     * Kiểm tra xem có các bước tính toán chi tiết không
+     * @return true nếu có các bước chi tiết
+     */
+    public boolean hasCalculationSteps() {
+        return calculationSteps != null && !calculationSteps.isEmpty();
     }
 
     // Các getters mới
@@ -135,5 +179,30 @@ public class CalculationRecord implements Serializable {
                 (hasTwoInputs() ? " with (" + inputMatrixB.getRows() + "x" +
                         inputMatrixB.getColumns() + ")" : "") +
                 " → (" + resultMatrix.getRows() + "x" + resultMatrix.getColumns() + ")";
+    }
+
+    /**
+     * Inner class to represent a single calculation step
+     */
+    public static class CalculationStep implements Serializable {
+        private String description;
+        private MatrixModel intermediateResult;
+
+        public CalculationStep(String description, MatrixModel intermediateResult) {
+            this.description = description;
+            this.intermediateResult = intermediateResult;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public MatrixModel getIntermediateResult() {
+            return intermediateResult;
+        }
+
+        public boolean hasIntermediateResult() {
+            return intermediateResult != null;
+        }
     }
 }

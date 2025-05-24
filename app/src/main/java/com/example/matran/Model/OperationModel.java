@@ -2,6 +2,9 @@ package com.example.matran.Model;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Model class for matrix operations
  */
@@ -30,6 +33,43 @@ public class OperationModel {
     }
 
     /**
+     * Add two matrices with steps
+     * @param a first matrix
+     * @param b second matrix
+     * @return calculation record with steps
+     */
+    public static CalculationRecord addWithSteps(MatrixModel a, MatrixModel b) {
+        if (a.getRows() != b.getRows() || a.getColumns() != b.getColumns()) {
+            throw new IllegalArgumentException("Matrices must have same dimensions for addition");
+        }
+
+        MatrixModel result = new MatrixModel(a.getRows(), a.getColumns());
+        CalculationRecord record = new CalculationRecord("Add Matrices", a, b, result);
+
+        record.addStep("Cộng hai ma trận cùng kích thước bằng cách cộng từng phần tử tương ứng.");
+
+        for (int i = 0; i < a.getRows(); i++) {
+            for (int j = 0; j < a.getColumns(); j++) {
+                double sum = a.getValue(i, j) + b.getValue(i, j);
+                result.setValue(i, j, sum);
+
+                // Chỉ lưu một vài bước ví dụ để không quá nhiều
+                if (i == 0 && j == 0) {
+                    record.addStep(String.format("C[%d,%d] = A[%d,%d] + B[%d,%d] = %.2f + %.2f = %.2f",
+                            i, j, i, j, i, j, a.getValue(i, j), b.getValue(i, j), sum));
+                }
+                else if (i == a.getRows()-1 && j == a.getColumns()-1) {
+                    record.addStep(String.format("C[%d,%d] = A[%d,%d] + B[%d,%d] = %.2f + %.2f = %.2f",
+                            i, j, i, j, i, j, a.getValue(i, j), b.getValue(i, j), sum));
+                }
+            }
+        }
+
+        record.addStep("Kết quả cuối cùng:", result);
+        return record;
+    }
+
+    /**
      * Subtract two matrices
      * @param a first matrix
      * @param b second matrix
@@ -48,6 +88,43 @@ public class OperationModel {
             }
         }
         return result;
+    }
+
+    /**
+     * Subtract two matrices with steps
+     * @param a first matrix
+     * @param b second matrix
+     * @return calculation record with steps
+     */
+    public static CalculationRecord subtractWithSteps(MatrixModel a, MatrixModel b) {
+        if (a.getRows() != b.getRows() || a.getColumns() != b.getColumns()) {
+            throw new IllegalArgumentException("Matrices must have same dimensions for subtraction");
+        }
+
+        MatrixModel result = new MatrixModel(a.getRows(), a.getColumns());
+        CalculationRecord record = new CalculationRecord("Subtract Matrices", a, b, result);
+
+        record.addStep("Trừ hai ma trận cùng kích thước bằng cách trừ từng phần tử tương ứng.");
+
+        for (int i = 0; i < a.getRows(); i++) {
+            for (int j = 0; j < a.getColumns(); j++) {
+                double diff = a.getValue(i, j) - b.getValue(i, j);
+                result.setValue(i, j, diff);
+
+                // Chỉ lưu một vài bước ví dụ để không quá nhiều
+                if (i == 0 && j == 0) {
+                    record.addStep(String.format("C[%d,%d] = A[%d,%d] - B[%d,%d] = %.2f - %.2f = %.2f",
+                            i, j, i, j, i, j, a.getValue(i, j), b.getValue(i, j), diff));
+                }
+                else if (i == a.getRows()-1 && j == a.getColumns()-1) {
+                    record.addStep(String.format("C[%d,%d] = A[%d,%d] - B[%d,%d] = %.2f - %.2f = %.2f",
+                            i, j, i, j, i, j, a.getValue(i, j), b.getValue(i, j), diff));
+                }
+            }
+        }
+
+        record.addStep("Kết quả cuối cùng:", result);
+        return record;
     }
 
     /**
@@ -76,6 +153,70 @@ public class OperationModel {
     }
 
     /**
+     * Multiply two matrices with steps
+     * @param a first matrix
+     * @param b second matrix
+     * @return calculation record with steps
+     */
+    public static CalculationRecord multiplyWithSteps(MatrixModel a, MatrixModel b) {
+        if (a.getColumns() != b.getRows()) {
+            throw new IllegalArgumentException("Number of columns in first matrix must equal number of rows in second matrix");
+        }
+
+        MatrixModel result = new MatrixModel(a.getRows(), b.getColumns());
+        CalculationRecord record = new CalculationRecord("Multiply Matrices", a, b, result);
+
+        record.addStep("Ma trận kết quả có kích thước (" + a.getRows() + "×" + b.getColumns() + ")");
+        record.addStep("Để nhân hai ma trận, ta tính từng phần tử của ma trận kết quả bằng tích vô hướng của hàng thứ i của ma trận A với cột thứ j của ma trận B.");
+
+        // Chỉ hiển thị các bước cho một vài phần tử đại diện
+        int numStepsToShow = Math.min(3, a.getRows() * b.getColumns());
+        int stepsShown = 0;
+
+        for (int i = 0; i < a.getRows() && stepsShown < numStepsToShow; i++) {
+            for (int j = 0; j < b.getColumns() && stepsShown < numStepsToShow; j++) {
+                StringBuilder stepDesc = new StringBuilder();
+                stepDesc.append(String.format("Tính C[%d,%d] = ", i, j));
+
+                double sum = 0;
+                for (int k = 0; k < a.getColumns(); k++) {
+                    double product = a.getValue(i, k) * b.getValue(k, j);
+                    sum += product;
+
+                    stepDesc.append(String.format("A[%d,%d] × B[%d,%d]", i, k, k, j));
+                    if (k < a.getColumns() - 1) {
+                        stepDesc.append(" + ");
+                    }
+                }
+
+                stepDesc.append("\n= ");
+
+                for (int k = 0; k < a.getColumns(); k++) {
+                    double product = a.getValue(i, k) * b.getValue(k, j);
+                    stepDesc.append(String.format("%.2f × %.2f", a.getValue(i, k), b.getValue(k, j)));
+
+                    if (k < a.getColumns() - 1) {
+                        stepDesc.append(" + ");
+                    }
+                }
+
+                stepDesc.append(String.format(" = %.2f", sum));
+                record.addStep(stepDesc.toString());
+
+                result.setValue(i, j, sum);
+                stepsShown++;
+            }
+        }
+
+        if (stepsShown < a.getRows() * b.getColumns()) {
+            record.addStep("... và tương tự cho các phần tử khác.");
+        }
+
+        record.addStep("Kết quả cuối cùng:", result);
+        return record;
+    }
+
+    /**
      * Transpose a matrix
      * @param matrix input matrix
      * @return transposed matrix
@@ -88,6 +229,34 @@ public class OperationModel {
             }
         }
         return result;
+    }
+
+    /**
+     * Transpose a matrix with steps
+     * @param matrix input matrix
+     * @return calculation record with steps
+     */
+    public static CalculationRecord transposeWithSteps(MatrixModel matrix) {
+        MatrixModel result = new MatrixModel(matrix.getColumns(), matrix.getRows());
+        CalculationRecord record = new CalculationRecord("Transpose", matrix, result);
+
+        record.addStep("Chuyển vị ma trận bằng cách đổi chỗ hàng và cột.");
+        record.addStep("Ma trận kết quả có kích thước (" + matrix.getColumns() + "×" + matrix.getRows() + ")");
+
+        for (int i = 0; i < matrix.getRows(); i++) {
+            for (int j = 0; j < matrix.getColumns(); j++) {
+                result.setValue(j, i, matrix.getValue(i, j));
+
+                // Chỉ ghi lại một vài bước để minh họa
+                if ((i == 0 && j == 0) || (i == matrix.getRows()-1 && j == matrix.getColumns()-1)) {
+                    record.addStep(String.format("B[%d,%d] = A[%d,%d] = %.2f",
+                            j, i, i, j, matrix.getValue(i, j)));
+                }
+            }
+        }
+
+        record.addStep("Kết quả cuối cùng:", result);
+        return record;
     }
 
     /**
@@ -113,6 +282,75 @@ public class OperationModel {
         for (int j = 0; j < n; j++) {
             det += Math.pow(-1, j) * matrix.getValue(0, j) * determinant(getSubMatrix(matrix, 0, j));
         }
+        return det;
+    }
+
+    /**
+     * Calculate determinant of a square matrix with steps
+     * @param matrix input matrix
+     * @return calculation record with steps
+     */
+    public static CalculationRecord determinantWithSteps(MatrixModel matrix) {
+        List<String> steps = new ArrayList<>();
+        double det = determinantWithSteps(matrix, steps, "");
+
+        MatrixModel resultMatrix = new MatrixModel(1, 1);
+        resultMatrix.setValue(0, 0, det);
+
+        CalculationRecord record = new CalculationRecord("Determinant", matrix, resultMatrix);
+
+        // Add all collected steps
+        for (String step : steps) {
+            record.addStep(step);
+        }
+
+        record.addStep(String.format("Kết quả cuối cùng: det(A) = %.4f", det));
+        return record;
+    }
+
+    /**
+     * Helper method to calculate determinant with steps
+     * @param matrix input matrix
+     * @param steps list to collect steps
+     * @param prefix prefix for indentation
+     * @return determinant value
+     */
+    private static double determinantWithSteps(MatrixModel matrix, List<String> steps, String prefix) {
+        int n = matrix.getRows();
+
+        if (n == 1) {
+            steps.add(prefix + "det([" + matrix.getValue(0, 0) + "]) = " + matrix.getValue(0, 0));
+            return matrix.getValue(0, 0);
+        }
+
+        if (n == 2) {
+            double a = matrix.getValue(0, 0);
+            double b = matrix.getValue(0, 1);
+            double c = matrix.getValue(1, 0);
+            double d = matrix.getValue(1, 1);
+            double det = a * d - b * c;
+
+            steps.add(prefix + String.format("det([[%.2f, %.2f], [%.2f, %.2f]]) = %.2f × %.2f - %.2f × %.2f = %.2f",
+                    a, b, c, d, a, d, b, c, det));
+            return det;
+        }
+
+        steps.add(prefix + "Using Laplace expansion along the first row:");
+
+        double det = 0;
+        for (int j = 0; j < n; j++) {
+            double cofactor = Math.pow(-1, j) * matrix.getValue(0, j);
+            steps.add(prefix + String.format("Term %d: (-1)^%d × %.2f × det(submatrix)", j+1, j, matrix.getValue(0, j)));
+
+            MatrixModel subMatrix = getSubMatrix(matrix, 0, j);
+            steps.add(prefix + "  Calculating determinant of submatrix...");
+            double subDet = determinantWithSteps(subMatrix, steps, prefix + "  ");
+
+            det += cofactor * subDet;
+            steps.add(prefix + String.format("Term %d = %.2f × %.2f = %.2f", j+1, cofactor, subDet, cofactor * subDet));
+        }
+
+        steps.add(prefix + String.format("Adding all terms: det = %.4f", det));
         return det;
     }
 
@@ -143,6 +381,91 @@ public class OperationModel {
         }
 
         return result;
+    }
+
+    /**
+     * Calculate inverse of a square matrix with steps
+     * @param matrix input matrix
+     * @return calculation record with steps
+     */
+    public static CalculationRecord inverseWithSteps(MatrixModel matrix) {
+        if (matrix.getRows() != matrix.getColumns()) {
+            throw new IllegalArgumentException("Inverse can only be calculated for square matrices");
+        }
+
+        CalculationRecord record = new CalculationRecord("Inverse Matrix", matrix, null);
+
+        record.addStep("Bước 1: Tính định thức của ma trận");
+        double det = determinant(matrix);
+        record.addStep(String.format("Định thức det(A) = %.4f", det));
+
+        if (Math.abs(det) < 1e-10) {
+            throw new IllegalArgumentException("Ma trận suy biến, không tồn tại ma trận nghịch đảo");
+        }
+
+        record.addStep("Bước 2: Tính ma trận phụ hợp (adjugate)");
+
+        int n = matrix.getRows();
+        MatrixModel cofactorMatrix = new MatrixModel(n, n);
+
+        // Nếu ma trận nhỏ (2x2), hiển thị chi tiết
+        if (n == 2) {
+            double a = matrix.getValue(0, 0);
+            double b = matrix.getValue(0, 1);
+            double c = matrix.getValue(1, 0);
+            double d = matrix.getValue(1, 1);
+
+            record.addStep(String.format("Ma trận phụ hợp = [[%f, %f], [%f, %f]]", d, -b, -c, a));
+
+            cofactorMatrix.setValue(0, 0, d);
+            cofactorMatrix.setValue(0, 1, -b);
+            cofactorMatrix.setValue(1, 0, -c);
+            cofactorMatrix.setValue(1, 1, a);
+        } else {
+            // Nếu ma trận lớn hơn, chỉ hiển thị một phần
+            record.addStep("Tính từng phần tử của ma trận phụ hợp...");
+            record.addStep("(Quá trình này gồm nhiều bước con, chỉ hiển thị một vài ví dụ)");
+
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    MatrixModel subMatrix = getSubMatrix(matrix, i, j);
+                    double minorDet = determinant(subMatrix);
+                    double cofactor = Math.pow(-1, i + j) * minorDet;
+                    cofactorMatrix.setValue(i, j, cofactor);
+
+                    // Chỉ hiển thị một vài ví dụ
+                    if ((i == 0 && j == 0) || (i == n-1 && j == n-1)) {
+                        record.addStep(String.format("Phần tử phụ hợp tại (%d,%d): (-1)^(%d+%d) × %.4f = %.4f",
+                                i, j, i, j, minorDet, cofactor));
+                    }
+                }
+            }
+            record.addStep("Ma trận phụ hợp:", cofactorMatrix);
+        }
+
+        record.addStep("Bước 3: Chuyển vị ma trận phụ hợp");
+        MatrixModel adjugate = new MatrixModel(n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                adjugate.setValue(j, i, cofactorMatrix.getValue(i, j));
+            }
+        }
+        record.addStep("Ma trận phụ hợp chuyển vị:", adjugate);
+
+        record.addStep("Bước 4: Chia ma trận phụ hợp chuyển vị cho định thức");
+        MatrixModel result = new MatrixModel(n, n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                result.setValue(i, j, adjugate.getValue(i, j) / det);
+            }
+        }
+
+        record.addStep("Ma trận nghịch đảo = ma trận phụ hợp chuyển vị / định thức:", result);
+        record.addStep("Kết quả cuối cùng:", result);
+
+        // Set final result
+        record = new CalculationRecord("Inverse Matrix", matrix, result);
+        return record;
     }
 
     /**
@@ -179,7 +502,7 @@ public class OperationModel {
 
         return result;
     }
-    
+
     /**
      * Calculate rank of a matrix
      * @param matrix input matrix
@@ -189,7 +512,7 @@ public class OperationModel {
         // Implementing Gaussian elimination to find rank
         MatrixModel rref = getRREF(matrix.copy());
         int rank = 0;
-        
+
         for (int i = 0; i < rref.getRows(); i++) {
             boolean nonZeroRow = false;
             for (int j = 0; j < rref.getColumns(); j++) {
@@ -202,10 +525,56 @@ public class OperationModel {
                 rank++;
             }
         }
-        
+
         return rank;
     }
-    
+
+    /**
+     * Calculate rank of a matrix with steps
+     * @param matrix input matrix
+     * @return calculation record with steps
+     */
+    public static CalculationRecord rankWithSteps(MatrixModel matrix) {
+        CalculationRecord record = new CalculationRecord("Rank", matrix, null);
+
+        record.addStep("Bước 1: Chuyển ma trận về dạng bậc thang (RREF)");
+
+        List<MatrixModel> steps = new ArrayList<>();
+        MatrixModel rref = getRREFWithSteps(matrix.copy(), steps);
+
+        // Hiển thị các bước biến đổi
+        for (int i = 0; i < steps.size(); i++) {
+            record.addStep("Ma trận sau biến đổi " + (i+1) + ":", steps.get(i));
+        }
+
+        record.addStep("Ma trận RREF cuối cùng:", rref);
+
+        // Đếm số hàng khác không
+        int rank = 0;
+        for (int i = 0; i < rref.getRows(); i++) {
+            boolean nonZeroRow = false;
+            for (int j = 0; j < rref.getColumns(); j++) {
+                if (Math.abs(rref.getValue(i, j)) > 1e-10) {
+                    nonZeroRow = true;
+                    break;
+                }
+            }
+            if (nonZeroRow) {
+                rank++;
+            }
+        }
+
+        record.addStep(String.format("Bước 2: Đếm số hàng khác 0 trong ma trận bậc thang"));
+        record.addStep(String.format("Rank = %d", rank));
+
+        MatrixModel resultMatrix = new MatrixModel(1, 1);
+        resultMatrix.setValue(0, 0, rank);
+
+        // Tạo record mới với kết quả cuối cùng
+        record = new CalculationRecord("Rank", matrix, resultMatrix);
+        return record;
+    }
+
     /**
      * Solve system of linear equations Ax = b
      * @param coefficients coefficient matrix A
@@ -216,7 +585,7 @@ public class OperationModel {
         if (coefficients.getRows() != constants.getRows() || constants.getColumns() != 1) {
             throw new IllegalArgumentException("Dimensions mismatch for linear system");
         }
-        
+
         try {
             // Using inverse method: x = A^-1 * b
             MatrixModel inverse = inverse(coefficients);
@@ -225,7 +594,106 @@ public class OperationModel {
             throw new IllegalArgumentException("System is singular or underdetermined");
         }
     }
-    
+
+    /**
+     * Solve system of linear equations Ax = b with steps
+     * @param coefficients coefficient matrix A
+     * @param constants constant vector b
+     * @return calculation record with steps
+     */
+    public static CalculationRecord solveLinearSystemWithSteps(MatrixModel coefficients, MatrixModel constants) {
+        if (coefficients.getRows() != constants.getRows() || constants.getColumns() != 1) {
+            throw new IllegalArgumentException("Dimensions mismatch for linear system");
+        }
+
+        CalculationRecord record = new CalculationRecord("Giải Hệ Phương Trình Tuyến Tính", coefficients, constants, null);
+
+        record.addStep("Giải hệ phương trình tuyến tính Ax = b");
+        record.addStep("A là ma trận hệ số " + coefficients.getRows() + "×" + coefficients.getColumns());
+        record.addStep("b là vector vế phải:");
+
+        // Hiển thị hệ phương trình
+        StringBuilder equations = new StringBuilder();
+        for (int i = 0; i < coefficients.getRows(); i++) {
+            equations.append("Phương trình ").append(i+1).append(": ");
+
+            for (int j = 0; j < coefficients.getColumns(); j++) {
+                double coef = coefficients.getValue(i, j);
+                if (j > 0) {
+                    if (coef >= 0) {
+                        equations.append(" + ");
+                    } else {
+                        equations.append(" - ");
+                        coef = -coef;
+                    }
+                } else if (coef < 0) {
+                    equations.append("-");
+                    coef = -coef;
+                }
+
+                equations.append(String.format("%.2f×x%d", coef, j+1));
+            }
+
+            equations.append(" = ").append(String.format("%.2f", constants.getValue(i, 0))).append("\n");
+        }
+        record.addStep("Các phương trình:\n" + equations.toString());
+
+        record.addStep("Phương pháp 1: Sử dụng ma trận nghịch đảo");
+        record.addStep("x = A^(-1) × b");
+
+        record.addStep("Bước 1: Tính định thức của ma trận hệ số A");
+        double det = determinant(coefficients);
+        record.addStep(String.format("det(A) = %.4f", det));
+
+        if (Math.abs(det) < 1e-10) {
+            throw new IllegalArgumentException("Hệ phương trình vô nghiệm hoặc vô số nghiệm (ma trận suy biến)");
+        }
+
+        record.addStep("Bước 2: Tính ma trận nghịch đảo của A");
+        MatrixModel inverse = inverse(coefficients);
+        record.addStep("Ma trận nghịch đảo A^(-1):", inverse);
+
+        record.addStep("Bước 3: Tính x = A^(-1) × b");
+        MatrixModel result = multiply(inverse, constants);
+
+        // Hiển thị chi tiết nhân ma trận
+        StringBuilder multiplySteps = new StringBuilder();
+        for (int i = 0; i < result.getRows(); i++) {
+            multiplySteps.append(String.format("x%d = ", i+1));
+
+            for (int k = 0; k < coefficients.getRows(); k++) {
+                multiplySteps.append(String.format("%.4f × %.4f", inverse.getValue(i, k), constants.getValue(k, 0)));
+
+                if (k < coefficients.getRows() - 1) {
+                    multiplySteps.append(" + ");
+                }
+            }
+
+            multiplySteps.append(String.format(" = %.4f\n", result.getValue(i, 0)));
+        }
+
+        record.addStep("Chi tiết tính x = A^(-1) × b:\n" + multiplySteps.toString());
+        record.addStep("Kết quả cuối cùng:", result);
+
+        // Kiểm tra kết quả
+        record.addStep("Kiểm tra kết quả:");
+        MatrixModel check = multiply(coefficients, result);
+
+        StringBuilder verification = new StringBuilder();
+        for (int i = 0; i < check.getRows(); i++) {
+            verification.append(String.format("Phương trình %d: %.4f ≈ %.4f %s\n",
+                    i+1,
+                    check.getValue(i, 0),
+                    constants.getValue(i, 0),
+                    Math.abs(check.getValue(i, 0) - constants.getValue(i, 0)) < 1e-10 ? "✓" : "✗"));
+        }
+        record.addStep("Kiểm tra A × x = b?\n" + verification.toString());
+
+        // Tạo record mới với kết quả cuối cùng
+        record = new CalculationRecord("Giải Hệ Phương Trình Tuyến Tính", coefficients, constants, result);
+        return record;
+    }
+
     /**
      * Get submatrix by removing specified row and column
      * @param matrix original matrix
@@ -236,11 +704,11 @@ public class OperationModel {
     private static MatrixModel getSubMatrix(MatrixModel matrix, int rowToRemove, int colToRemove) {
         int n = matrix.getRows();
         MatrixModel subMatrix = new MatrixModel(n - 1, n - 1);
-        
+
         int r = 0;
         for (int i = 0; i < n; i++) {
             if (i == rowToRemove) continue;
-            
+
             int c = 0;
             for (int j = 0; j < n; j++) {
                 if (j == colToRemove) continue;
@@ -249,7 +717,7 @@ public class OperationModel {
             }
             r++;
         }
-        
+
         return subMatrix;
     }
 
@@ -428,6 +896,7 @@ public class OperationModel {
         // Đối với ma trận lớn hơn
         throw new UnsupportedOperationException("Eigenvalue calculation for matrices larger than 2x2 is not implemented");
     }
+
     /**
      * Calculate Reduced Row Echelon Form (RREF) of matrix
      * @param matrix input matrix
@@ -437,12 +906,12 @@ public class OperationModel {
         int lead = 0;
         int rowCount = matrix.getRows();
         int colCount = matrix.getColumns();
-        
+
         for (int r = 0; r < rowCount; r++) {
             if (lead >= colCount) {
                 break;
             }
-            
+
             int i = r;
             while (Math.abs(matrix.getValue(i, lead)) < 1e-10) {
                 i++;
@@ -454,7 +923,7 @@ public class OperationModel {
                     }
                 }
             }
-            
+
             if (lead < colCount) {
                 // Swap rows
                 for (int j = 0; j < colCount; j++) {
@@ -462,7 +931,7 @@ public class OperationModel {
                     matrix.setValue(r, j, matrix.getValue(i, j));
                     matrix.setValue(i, j, temp);
                 }
-                
+
                 // Scale row
                 double div = matrix.getValue(r, lead);
                 if (Math.abs(div) > 1e-10) {
@@ -470,7 +939,7 @@ public class OperationModel {
                         matrix.setValue(r, j, matrix.getValue(r, j) / div);
                     }
                 }
-                
+
                 // Eliminate other rows
                 for (int j = 0; j < rowCount; j++) {
                     if (j != r) {
@@ -480,11 +949,79 @@ public class OperationModel {
                         }
                     }
                 }
-                
+
                 lead++;
             }
         }
-        
+
+        return matrix;
+    }
+
+    /**
+     * Calculate Reduced Row Echelon Form (RREF) of matrix with steps
+     * @param matrix input matrix
+     * @param steps list to store intermediate steps
+     * @return matrix in RREF
+     */
+    private static MatrixModel getRREFWithSteps(MatrixModel matrix, List<MatrixModel> steps) {
+        int lead = 0;
+        int rowCount = matrix.getRows();
+        int colCount = matrix.getColumns();
+
+        for (int r = 0; r < rowCount; r++) {
+            if (lead >= colCount) {
+                break;
+            }
+
+            int i = r;
+            while (Math.abs(matrix.getValue(i, lead)) < 1e-10) {
+                i++;
+                if (i == rowCount) {
+                    i = r;
+                    lead++;
+                    if (lead == colCount) {
+                        break;
+                    }
+                }
+            }
+
+            if (lead < colCount) {
+                // Swap rows if needed
+                if (i != r) {
+                    for (int j = 0; j < colCount; j++) {
+                        double temp = matrix.getValue(r, j);
+                        matrix.setValue(r, j, matrix.getValue(i, j));
+                        matrix.setValue(i, j, temp);
+                    }
+                    steps.add(matrix.copy());
+                }
+
+                // Scale row
+                double div = matrix.getValue(r, lead);
+                if (Math.abs(div) > 1e-10) {
+                    for (int j = 0; j < colCount; j++) {
+                        matrix.setValue(r, j, matrix.getValue(r, j) / div);
+                    }
+                    steps.add(matrix.copy());
+                }
+
+                // Eliminate other rows
+                for (int j = 0; j < rowCount; j++) {
+                    if (j != r) {
+                        double sub = matrix.getValue(j, lead);
+                        if (Math.abs(sub) > 1e-10) {
+                            for (int k = 0; k < colCount; k++) {
+                                matrix.setValue(j, k, matrix.getValue(j, k) - sub * matrix.getValue(r, k));
+                            }
+                            steps.add(matrix.copy());
+                        }
+                    }
+                }
+
+                lead++;
+            }
+        }
+
         return matrix;
     }
 }

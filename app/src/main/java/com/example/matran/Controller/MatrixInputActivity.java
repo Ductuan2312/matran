@@ -363,6 +363,9 @@ public class MatrixInputActivity extends AppCompatActivity {
     /**
      * Handle calculate button click
      */
+    /**
+     * Handle calculate button click
+     */
     private void onCalculateClick(View view) {
         // Read matrix from input fields
         MatrixModel matrixA = readMatrixFromInputs(false);
@@ -387,90 +390,59 @@ public class MatrixInputActivity extends AppCompatActivity {
         }
 
         try {
-            // Perform the requested operation
-            MatrixModel result = null;
-            double scalarResult = 0;
-            boolean isScalarResult = false;
-            boolean isSVDResult = false;
-            MatrixModel[] svdMatrices = null;
+            // Perform the requested operation with steps
+            CalculationRecord record = null;
 
             switch (operationType) {
                 case "ADD":
-                    result = OperationModel.add(matrixA, matrixB);
+                    record = OperationModel.addWithSteps(matrixA, matrixB);
                     break;
                 case "SUBTRACT":
-                    result = OperationModel.subtract(matrixA, matrixB);
+                    record = OperationModel.subtractWithSteps(matrixA, matrixB);
                     break;
                 case "MULTIPLY":
-                    result = OperationModel.multiply(matrixA, matrixB);
+                    record = OperationModel.multiplyWithSteps(matrixA, matrixB);
                     break;
                 case "TRANSPOSE":
-                    result = OperationModel.transpose(matrixA);
+                    record = OperationModel.transposeWithSteps(matrixA);
                     break;
                 case "DETERMINANT":
-                    scalarResult = OperationModel.determinant(matrixA);
-                    isScalarResult = true;
+                    record = OperationModel.determinantWithSteps(matrixA);
                     break;
                 case "EIGENVALUES":
-                    result = OperationModel.eigenvalues(matrixA);
+                    // Chưa có phiên bản với các bước
+                    MatrixModel eigenMatrix = OperationModel.eigenvalues(matrixA);
+                    record = new CalculationRecord("Trị Riêng", matrixA, eigenMatrix);
                     break;
                 case "INVERSE":
-                    result = OperationModel.inverse(matrixA);
+                    record = OperationModel.inverseWithSteps(matrixA);
                     break;
                 case "CONVOLUTION":
-                    result = OperationModel.convolution(matrixA, matrixB);
+                    // Chưa có phiên bản với các bước
+                    MatrixModel convResult = OperationModel.convolution(matrixA, matrixB);
+                    record = new CalculationRecord("Convolution", matrixA, matrixB, convResult);
                     break;
                 case "SVD":
-                    svdMatrices = OperationModel.svd(matrixA);
-                    isSVDResult = true;
-                    result = svdMatrices[1];
+                    // Chưa có phiên bản với các bước
+                    MatrixModel[] svdMatrices = OperationModel.svd(matrixA);
+                    record = new CalculationRecord(
+                            "Phân Tích SVD",
+                            matrixA,
+                            svdMatrices[0], // Ma trận U
+                            svdMatrices[1], // Ma trận S
+                            svdMatrices[2]  // Ma trận V^T
+                    );
                     break;
                 case "RANK":
-                    scalarResult = OperationModel.rank(matrixA);
-                    isScalarResult = true;
+                    record = OperationModel.rankWithSteps(matrixA);
                     break;
                 case "LINEAR_SYSTEM":
-                    // Sử dụng matrixA và constants
-                    result = OperationModel.solveLinearSystem(matrixA, constants);
+                    record = OperationModel.solveLinearSystemWithSteps(matrixA, constants);
                     break;
                 default:
                     // Just show the input matrix
-                    result = matrixA;
+                    record = new CalculationRecord(operationTitle, matrixA, matrixA);
                     break;
-            }
-
-            // Tạo calculation record cho history
-            CalculationRecord record;
-            if (isSVDResult && svdMatrices != null) {
-                // Sử dụng constructor SVD đặc biệt
-                record = new CalculationRecord(
-                        operationTitle,
-                        matrixA,
-                        svdMatrices[0], // Ma trận U
-                        svdMatrices[1], // Ma trận S
-                        svdMatrices[2]  // Ma trận V^T
-                );
-            } else if (isLinearSystem) {
-                // Cho hệ phương trình tuyến tính
-                record = new CalculationRecord(operationTitle, matrixA, constants, result);
-            } else if (needsSecondMatrix) {
-                if (isScalarResult) {
-                    // Create a 1x1 matrix to hold scalar result
-                    MatrixModel scalarMatrix = new MatrixModel(1, 1);
-                    scalarMatrix.setValue(0, 0, scalarResult);
-                    record = new CalculationRecord(operationTitle, matrixA, matrixB, scalarMatrix);
-                } else {
-                    record = new CalculationRecord(operationTitle, matrixA, matrixB, result);
-                }
-            } else {
-                if (isScalarResult) {
-                    // Create a 1x1 matrix to hold scalar result
-                    MatrixModel scalarMatrix = new MatrixModel(1, 1);
-                    scalarMatrix.setValue(0, 0, scalarResult);
-                    record = new CalculationRecord(operationTitle, matrixA, scalarMatrix);
-                } else {
-                    record = new CalculationRecord(operationTitle, matrixA, result);
-                }
             }
 
             // Lưu vào lịch sử
@@ -480,13 +452,26 @@ public class MatrixInputActivity extends AppCompatActivity {
             // Navigate to result screen
             Intent intent = new Intent(this, ResultActivity.class);
             intent.putExtra("calculation_record", record);
+
+            // Xác định nếu kết quả là giá trị scalar (kết quả đơn lẻ)
+            boolean isScalarResult = false;
+            double scalarResult = 0;
+
+            if (operationType.equals("DETERMINANT") || operationType.equals("RANK")) {
+                isScalarResult = true;
+                MatrixModel result = record.getResultMatrix();
+                scalarResult = result.getValue(0, 0);
+            }
+
             intent.putExtra("is_scalar_result", isScalarResult);
             intent.putExtra("scalar_result", scalarResult);
             intent.putExtra("is_linear_system", isLinearSystem);
             startActivity(intent);
 
         } catch (IllegalArgumentException e) {
-            Toast.makeText(this, "Calculation error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Calculation error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (UnsupportedOperationException e) {
+            Toast.makeText(this, "Operation not supported: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

@@ -22,6 +22,8 @@ import com.example.matran.Model.MatrixModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
+import java.util.List;
+
 public class ResultActivity extends AppCompatActivity {
 
     // UI Components
@@ -292,6 +294,9 @@ public class ResultActivity extends AppCompatActivity {
     /**
      * Show the steps tab content
      */
+    /**
+     * Show the steps tab content
+     */
     private void showStepsTab() {
         // Clear current content
         tabContent.removeAllViews();
@@ -299,15 +304,59 @@ public class ResultActivity extends AppCompatActivity {
         // Inflate steps view
         View stepsView = getLayoutInflater().inflate(R.layout.tab_steps, tabContent, false);
 
-        // Get steps explanation based on operation type
-        String stepsExplanation = getStepsExplanation();
+        // Get steps content
+        String stepsContent;
+
+        // Kiểm tra xem có các bước chi tiết không
+        if (calculationRecord.hasCalculationSteps()) {
+            stepsContent = buildStepsContentFromSteps(calculationRecord);
+        } else {
+            // Sử dụng cách cũ nếu không có bước chi tiết
+            stepsContent = getStepsExplanation();
+        }
 
         // Set steps explanation text
         TextView stepsText = stepsView.findViewById(R.id.steps_text);
-        stepsText.setText(stepsExplanation);
+        stepsText.setText(stepsContent);
 
         // Add view to container
         tabContent.addView(stepsView);
+    }
+
+    /**
+     * Build steps content from calculation steps
+     */
+    private String buildStepsContentFromSteps(CalculationRecord record) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Các bước thực hiện ").append(record.getOperationType()).append(":\n\n");
+
+        List<CalculationRecord.CalculationStep> steps = record.getCalculationSteps();
+
+        for (int i = 0; i < steps.size(); i++) {
+            CalculationRecord.CalculationStep step = steps.get(i);
+            sb.append("Bước ").append(i + 1).append(": ").append(step.getDescription()).append("\n");
+
+            // Nếu có ma trận kết quả trung gian, hiển thị nó
+            if (step.hasIntermediateResult()) {
+                MatrixModel matrix = step.getIntermediateResult();
+                sb.append("\n");
+                for (int r = 0; r < matrix.getRows(); r++) {
+                    sb.append("[ ");
+                    for (int c = 0; c < matrix.getColumns(); c++) {
+                        sb.append(String.format("%.2f", matrix.getValue(r, c)));
+                        if (c < matrix.getColumns() - 1) {
+                            sb.append(", ");
+                        }
+                    }
+                    sb.append(" ]\n");
+                }
+                sb.append("\n");
+            }
+
+            sb.append("\n");
+        }
+
+        return sb.toString();
     }
 
     /**

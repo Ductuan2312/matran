@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">MatrixSolver</string>
+    <string name="app_name">Giải Ma Trận</string>
 
     <!-- Main Activity -->
     <string name="basic_operations">Phép toán cơ bản</string>
     <string name="advanced_operations">Phép toán nâng cao</string>
     <string name="recent_calculations">Tính toán gần đây</string>
     <string name="no_recent_calculations">Chưa có tính toán nào</string>
-    <string name="quick_action">Thao tác nhanh</string>
+    <string name="about">thông tin dev</string>
 
     <!-- Bottom Navigation -->
     <string name="calculator">Tính toán</string>

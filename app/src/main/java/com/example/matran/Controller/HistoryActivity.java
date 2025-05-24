@@ -106,13 +106,13 @@ public class HistoryActivity extends AppCompatActivity {
     private void onClearHistoryClick(View view) {
         // Show confirmation dialog
         new AlertDialog.Builder(this)
-                .setTitle("Clear History")
-                .setMessage("Are you sure you want to clear all calculation history?")
-                .setPositiveButton("Clear", (dialog, which) -> {
+                .setTitle("Xóa lịch sử")
+                .setMessage("Bạn có chắc chắn muốn xóa toàn bộ lịch sử không?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
                     historyModel.clearHistory();
                     loadHistory();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("Thoát", null)
                 .show();
     }
     
