@@ -370,35 +370,35 @@ public class ResultActivity extends AppCompatActivity {
 
         StringBuilder explanation = new StringBuilder();
 
-        // Generate explanation based on operation type
+        // Tạo lời giải thích dựa trên loại phép toán
         switch (operationType) {
             case "Add Matrices":
-                explanation.append("Steps for Matrix Addition:\n\n");
-                explanation.append("1. For each position (i,j) in the matrices:\n");
+                explanation.append("Các bước thực hiện phép Cộng Ma trận:\n\n");
+                explanation.append("1. Đối với mỗi vị trí (i,j) trong ma trận:\n");
                 explanation.append("   C[i,j] = A[i,j] + B[i,j]\n\n");
-                explanation.append("Example for position (0,0):\n");
+                explanation.append("Ví dụ cho vị trí (0,0):\n");
                 explanation.append("C[0,0] = A[0,0] + B[0,0]\n");
                 explanation.append(String.format("C[0,0] = %.2f + %.2f = %.2f",
                         matrixA.getValue(0, 0), matrixB.getValue(0, 0), result.getValue(0, 0)));
                 break;
 
             case "Subtract Matrices":
-                explanation.append("Steps for Matrix Subtraction:\n\n");
-                explanation.append("1. For each position (i,j) in the matrices:\n");
+                explanation.append("Các bước thực hiện phép Trừ Ma trận:\n\n");
+                explanation.append("1. Đối với mỗi vị trí (i,j) trong ma trận:\n");
                 explanation.append("   C[i,j] = A[i,j] - B[i,j]\n\n");
-                explanation.append("Example for position (0,0):\n");
+                explanation.append("Ví dụ cho vị trí (0,0):\n");
                 explanation.append("C[0,0] = A[0,0] - B[0,0]\n");
                 explanation.append(String.format("C[0,0] = %.2f - %.2f = %.2f",
                         matrixA.getValue(0, 0), matrixB.getValue(0, 0), result.getValue(0, 0)));
                 break;
 
             case "Multiply Matrices":
-                explanation.append("Steps for Matrix Multiplication:\n\n");
-                explanation.append("1. For each position (i,j) in the result matrix:\n");
-                explanation.append("   C[i,j] = Σ(A[i,k] * B[k,j]) for k = 0 to n-1\n\n");
+                explanation.append("Các bước thực hiện phép Nhân Ma trận:\n\n");
+                explanation.append("1. Đối với mỗi vị trí (i,j) trong ma trận kết quả:\n");
+                explanation.append("   C[i,j] = Σ(A[i,k] * B[k,j]) với k = 0 đến n-1\n\n");
 
-                // Example calculation for position (0,0)
-                explanation.append("Example for position (0,0):\n");
+                // Ví dụ tính toán cho vị trí (0,0)
+                explanation.append("Ví dụ cho vị trí (0,0):\n");
                 explanation.append("C[0,0] = ");
 
                 double sum = 0;
@@ -423,62 +423,62 @@ public class ResultActivity extends AppCompatActivity {
                 break;
 
             case "Transpose":
-                explanation.append("Steps for Matrix Transposition:\n\n");
-                explanation.append("1. For each position (i,j) in the original matrix:\n");
+                explanation.append("Các bước thực hiện phép Chuyển vị Ma trận:\n\n");
+                explanation.append("1. Đối với mỗi vị trí (i,j) trong ma trận ban đầu:\n");
                 explanation.append("   B[j,i] = A[i,j]\n\n");
-                explanation.append("Example for position (0,1):\n");
+                explanation.append("Ví dụ cho vị trí (0,1):\n");
                 explanation.append("B[1,0] = A[0,1]\n");
                 explanation.append(String.format("B[1,0] = %.2f", matrixA.getValue(0, 1)));
                 break;
 
             case "Determinant":
-                explanation.append("Steps for Determinant Calculation:\n\n");
+                explanation.append("Các bước tính Định thức:\n\n");
                 if (matrixA.getRows() == 2) {
-                    explanation.append("For a 2x2 matrix:\n");
+                    explanation.append("Đối với ma trận 2x2:\n");
                     explanation.append("det(A) = A[0,0] * A[1,1] - A[0,1] * A[1,0]\n");
                     explanation.append(String.format("det(A) = %.2f * %.2f - %.2f * %.2f = %.2f",
                             matrixA.getValue(0, 0), matrixA.getValue(1, 1),
                             matrixA.getValue(0, 1), matrixA.getValue(1, 0), scalarResult));
                 } else {
-                    explanation.append("For an NxN matrix, we use cofactor expansion along the first row:\n");
-                    explanation.append("det(A) = Σ((-1)^j * A[0,j] * det(M_j)) for j = 0 to n-1\n\n");
-                    explanation.append("where M_j is the submatrix formed by removing row 0 and column j.\n\n");
-                    explanation.append("The determinant calculation involves multiple recursive steps that are too detailed to display here.");
+                    explanation.append("Đối với ma trận NxN, chúng ta sử dụng khai triển theo cofactor dọc theo hàng đầu tiên:\n");
+                    explanation.append("det(A) = Σ((-1)^j * A[0,j] * det(M_j)) với j = 0 đến n-1\n\n");
+                    explanation.append("trong đó M_j là ma trận con được tạo bằng cách loại bỏ hàng 0 và cột j.\n\n");
+                    explanation.append("Việc tính định thức liên quan đến nhiều bước đệ quy phức tạp nên không thể hiển thị chi tiết ở đây.");
                 }
                 break;
 
             case "Inverse Matrix":
-                explanation.append("Steps for Matrix Inversion:\n\n");
-                explanation.append("1. Calculate the determinant of the matrix.\n");
-                explanation.append("2. If determinant is zero, the matrix is not invertible.\n");
-                explanation.append("3. For each element (i,j):\n");
-                explanation.append("   - Calculate the cofactor C_ij\n");
-                explanation.append("   - Calculate the adjugate matrix: adj(A)[j,i] = C_ij\n");
-                explanation.append("4. Divide each element of the adjugate by the determinant:\n");
+                explanation.append("Các bước tìm Ma trận Nghịch đảo:\n\n");
+                explanation.append("1. Tính định thức của ma trận.\n");
+                explanation.append("2. Nếu định thức bằng không, ma trận không khả nghịch.\n");
+                explanation.append("3. Đối với mỗi phần tử (i,j):\n");
+                explanation.append("   - Tính cofactor C_ij\n");
+                explanation.append("   - Tính ma trận phụ hợp: adj(A)[j,i] = C_ij\n");
+                explanation.append("4. Chia mỗi phần tử của ma trận phụ hợp cho định thức:\n");
                 explanation.append("   A^-1[i,j] = adj(A)[i,j] / det(A)\n\n");
-                explanation.append("The inversion process involves multiple steps that are too detailed to display here.");
+                explanation.append("Quá trình nghịch đảo liên quan đến nhiều bước phức tạp nên không thể hiển thị chi tiết ở đây.");
                 break;
 
             case "Phân Tích SVD":
-                explanation.append("Steps for Singular Value Decomposition (SVD):\n\n");
-                explanation.append("1. Calculate A^T * A (or A * A^T for wide matrices).\n");
-                explanation.append("2. Find the eigenvalues and eigenvectors of this matrix.\n");
-                explanation.append("   - The eigenvalues are the squares of the singular values.\n");
-                explanation.append("   - The eigenvectors form the columns of V.\n");
-                explanation.append("3. Calculate the singular values by taking the square root of the eigenvalues.\n");
-                explanation.append("4. Form the diagonal matrix Σ with singular values.\n");
-                explanation.append("5. Calculate U using the formula: U = A * V * Σ^-1\n\n");
-                explanation.append("The final decomposition is: A = U * Σ * V^T\n");
-                explanation.append("where:\n");
-                explanation.append("- U is an orthogonal matrix\n");
-                explanation.append("- Σ is a diagonal matrix with singular values\n");
-                explanation.append("- V^T is the transpose of an orthogonal matrix\n");
+                explanation.append("Các bước thực hiện Phân tích SVD (Singular Value Decomposition):\n\n");
+                explanation.append("1. Tính A^T * A (hoặc A * A^T cho ma trận rộng).\n");
+                explanation.append("2. Tìm trị riêng và vector riêng của ma trận này.\n");
+                explanation.append("   - Các trị riêng là bình phương của các giá trị kỳ dị.\n");
+                explanation.append("   - Các vector riêng tạo thành các cột của ma trận V.\n");
+                explanation.append("3. Tính các giá trị kỳ dị bằng cách lấy căn bậc hai của các trị riêng.\n");
+                explanation.append("4. Tạo ma trận đường chéo Σ với các giá trị kỳ dị.\n");
+                explanation.append("5. Tính ma trận U sử dụng công thức: U = A * V * Σ^-1\n\n");
+                explanation.append("Phân tích cuối cùng là: A = U * Σ * V^T\n");
+                explanation.append("trong đó:\n");
+                explanation.append("- U là ma trận trực giao\n");
+                explanation.append("- Σ là ma trận đường chéo chứa các giá trị kỳ dị\n");
+                explanation.append("- V^T là chuyển vị của một ma trận trực giao\n");
                 break;
 
-            // Add explanations for other operations as needed
+            // Thêm các lời giải thích cho các phép toán khác khi cần
 
             default:
-                explanation.append("Detailed steps for this operation are not available.");
+                explanation.append("Chi tiết các bước thực hiện cho phép toán này chưa được cập nhật.");
                 break;
         }
 
