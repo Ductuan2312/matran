@@ -1,3 +1,7 @@
+//matran - A matrix manipulation application
+//        Copyright (c) 2025 Đức Tuân
+//
+//        Licensed under the MIT License. See LICENSE file in the project root for full license information.
 package com.example.matran.Utils;
 
 import com.example.matran.Model.MatrixModel;
