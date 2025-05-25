@@ -1,6 +1,6 @@
 # Ma Trận - Ứng Dụng Tính Toán Ma Trận Toàn Diện
 
-![Ma Trận Logo](https://github.com/Ductuan2312/matran/raw/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png)
+![Ma Trận Logo](https://github.com/Ductuan2312/matran/blob/834f054e311249bbb15c01f5273798f4f9c9ea67/app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp)
 
 ## Tổng Quan
 
