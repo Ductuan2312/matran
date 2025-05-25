@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import com.example.matran.R;
 import com.example.matran.Model.CalculationRecord;
 import com.example.matran.Model.HistoryModel;
+import com.example.matran.Utils.OperationUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -29,6 +30,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -208,24 +210,34 @@ public class MainActivity extends AppCompatActivity {
             basicOperations.add(new OperationItem("Định Thức", R.drawable.ic_matrix_determinant, "DETERMINANT"));
             basicOperations.add(new OperationItem("Ma Trận Nghịch Đảo", R.drawable.ic_matrix_inverse, "INVERSE"));
 
-            // Calculate columnWidth - Lấy 50% chiều rộng màn hình cho mỗi thẻ (2 cột)
+            // Calculate columnWidth - Lấy chính xác 50% chiều rộng khả dụng cho mỗi thẻ
             int screenWidth = getResources().getDisplayMetrics().widthPixels;
-            int cardWidth = (screenWidth - 48) / 2; // Trừ đi padding của LinearLayout (16dp * 2) + margin giữa (16dp)
+            int padding = (int) (16 * getResources().getDisplayMetrics().density); // Convert 16dp to pixels
+            int availableWidth = screenWidth - (padding * 2); // Trừ padding bên trái và phải của LinearLayout ngoài
+            int cardWidth = availableWidth / 2 - (int)(8 * getResources().getDisplayMetrics().density); // Trừ đi margin
 
-            // Create card for each operation
-            for (OperationItem op : basicOperations) {
-                MaterialCardView card = createOperationCard(op);
+        // Create card for each operation
+        for (int i = 0; i < basicOperations.size(); i++) {
+            OperationItem op = basicOperations.get(i);
+            MaterialCardView card = createOperationCard(op);
 
-                // Đặt LayoutParams để thẻ lấp đầy không gian
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.width = cardWidth;
-                params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-                params.setMargins(4, 4, 4, 4);
+            // Đặt LayoutParams để thẻ lấp đầy không gian đều nhau
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.width = cardWidth;
+            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
 
-                card.setLayoutParams(params);
-                basicOperationsGrid.addView(card);
-            }
+            // Chỉnh căn lề cho đồng đều
+            params.setMargins(4, 4, 4, 4);
+
+            // Set column và row cho GridLayout
+            params.columnSpec = GridLayout.spec(i % 2, 1, 1f);
+            params.rowSpec = GridLayout.spec(i / 2, 1, 1f);
+
+            card.setLayoutParams(params);
+            basicOperationsGrid.addView(card);
         }
+
+    }
 
         /**
          * Set up advanced operations grid
@@ -239,19 +251,28 @@ public class MainActivity extends AppCompatActivity {
             advancedOperations.add(new OperationItem("Hạng Ma Trận", R.drawable.ic_matrix_add, "RANK"));
             advancedOperations.add(new OperationItem("Hệ Phương Trình Tuyến Tính", R.drawable.ic_linear_system, "LINEAR_SYSTEM"));
 
-            // Calculate columnWidth - Lấy 50% chiều rộng màn hình cho mỗi thẻ (2 cột)
+            // Calculate columnWidth - Lấy chính xác 50% chiều rộng khả dụng cho mỗi thẻ
             int screenWidth = getResources().getDisplayMetrics().widthPixels;
-            int cardWidth = (screenWidth - 48) / 2; // Trừ đi padding của LinearLayout (16dp * 2) + margin giữa (16dp)
+            int padding = (int) (16 * getResources().getDisplayMetrics().density); // Convert 16dp to pixels
+            int availableWidth = screenWidth - (padding * 2); // Trừ padding bên trái và phải của LinearLayout ngoài
+            int cardWidth = availableWidth / 2 - (int)(8 * getResources().getDisplayMetrics().density); // Trừ đi margin
 
             // Create card for each operation
-            for (OperationItem op : advancedOperations) {
+            for (int i = 0; i < advancedOperations.size(); i++) {
+                OperationItem op = advancedOperations.get(i);
                 MaterialCardView card = createOperationCard(op);
 
-                // Đặt LayoutParams để thẻ lấp đầy không gian
+                // Đặt LayoutParams để thẻ lấp đầy không gian đều nhau
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams();
                 params.width = cardWidth;
                 params.height = GridLayout.LayoutParams.WRAP_CONTENT;
+
+                // Chỉnh căn lề cho đồng đều
                 params.setMargins(4, 4, 4, 4);
+
+                // Set column và row cho GridLayout
+                params.columnSpec = GridLayout.spec(i % 2, 1, 1f);
+                params.rowSpec = GridLayout.spec(i / 2, 1, 1f);
 
                 card.setLayoutParams(params);
                 advancedOperationsGrid.addView(card);
@@ -342,8 +363,9 @@ public class MainActivity extends AppCompatActivity {
             TextView titleTextView = convertView.findViewById(R.id.calculation_title);
             TextView timestampTextView = convertView.findViewById(R.id.calculation_timestamp);
 
-            titleTextView.setText(record.getOperationType());
-            timestampTextView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm")
+            // Sử dụng tên tiếng Việt cho phép toán từ OperationUtils
+            titleTextView.setText(OperationUtils.getOperationDisplayName(getContext(), record.getOperationType()));
+            timestampTextView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
                     .format(record.getTimestamp()));
 
             // Set click listener to view this calculation

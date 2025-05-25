@@ -52,4 +52,22 @@
     <!-- Other UI Elements -->
     <string name="operation_icon">Biểu tượng phép toán</string>
     <string name="operation_title">Tiêu đề phép toán</string>
+
+    <!-- Bổ sung -->
+    <string name="matrix_calculation_result">Kết quả tính toán ma trận</string>
+    <string name="share_via">Chia sẻ qua</string>
+    <string name="result_with_colon">Kết quả:</string>
+    <string name="svd_decomposition">Phân tích SVD: A = U × Σ × V^T</string>
+    <string name="orthogonal_matrix_u">U (ma trận trực giao):</string>
+    <string name="singular_values_matrix">Σ (giá trị kỳ dị):</string>
+    <string name="orthogonal_transposed_matrix_vt">V^T (ma trận trực giao chuyển vị):</string>
+    <string name="singular_values">Giá trị kỳ dị</string>
+    <string name="dimensions_must_be_between">Kích thước phải từ 1 đến 10</string>
+    <string name="matrix_must_be_square">Ma trận phải là vuông cho phép toán này</string>
+    <string name="linear_system_square_matrix">Đối với hệ phương trình tuyến tính, ma trận phải là vuông (số phương trình = số ẩn)</string>
+    <string name="error_reading_matrix">Lỗi đọc giá trị ma trận</string>
+    <string name="error_reading_second_matrix">Lỗi đọc giá trị ma trận thứ hai</string>
+    <string name="error_reading_constants">Lỗi đọc vector hằng số</string>
+    <string name="calculation_error">Lỗi tính toán: </string>
+    <string name="operation_not_supported">Phép toán không được hỗ trợ: </string>
 </resources>

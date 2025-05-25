@@ -23,8 +23,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="2"
-            android:useDefaultMargins="true"
-            android:alignmentMode="alignBounds">
+            android:useDefaultMargins="false"
+            android:alignmentMode="alignBounds"
+            android:rowOrderPreserved="true">
             <!-- Các thẻ CardView cho các phép toán sẽ được thêm vào đây -->
         </GridLayout>
 
@@ -47,11 +48,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:columnCount="2"
-            android:useDefaultMargins="true"
-            android:alignmentMode="alignBounds">
-
+            android:useDefaultMargins="false"
+            android:alignmentMode="alignBounds"
+            android:rowOrderPreserved="true">
             <!-- Các thẻ CardView cho các phép toán nâng cao sẽ được thêm vào đây -->
-
         </GridLayout>
 
         <com.google.android.material.card.MaterialCardView
@@ -72,6 +72,15 @@
                     android:layout_height="wrap_content"
                     android:text="@string/recent_calculations"
                     android:textAppearance="?attr/textAppearanceHeadline6" />
+
+                <TextView
+                    android:id="@+id/empty_history_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chưa có phép tính nào gần đây"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:visibility="gone" />
 
                 <ListView
                     android:id="@+id/recent_calculations_list"

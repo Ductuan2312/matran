@@ -20,6 +20,7 @@ import com.example.matran.Model.MatrixModel;
 import com.example.matran.R;
 import com.example.matran.Model.CalculationRecord;
 import com.example.matran.Model.HistoryModel;
+import com.example.matran.Utils.OperationUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
@@ -149,9 +150,9 @@ public class HistoryActivity extends AppCompatActivity {
             TextView operationText = view.findViewById(R.id.operation_text);
             TextView dimensionsText = view.findViewById(R.id.dimensions_text);
             TextView timestampText = view.findViewById(R.id.timestamp_text);
-            
-            // Set texts
-            operationText.setText(record.getOperationType());
+
+            // Sử dụng tên tiếng Việt cho phép toán từ OperationUtils
+            operationText.setText(OperationUtils.getOperationDisplayName(getContext(), record.getOperationType()));
             
             // Format dimensions
             String dimensions = formatDimensions(record);

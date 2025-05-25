@@ -19,10 +19,12 @@ import com.example.matran.R;
 import com.example.matran.Model.CalculationRecord;
 import com.example.matran.Model.HistoryModel;
 import com.example.matran.Model.MatrixModel;
+import com.example.matran.Utils.OperationUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ResultActivity extends AppCompatActivity {
 
@@ -65,10 +67,11 @@ public class ResultActivity extends AppCompatActivity {
         tabContent = findViewById(R.id.tab_content);
         shareFab = findViewById(R.id.share_fab);
 
-        // Set toolbar
+        // Set toolbar với tên phép toán đã việt hóa
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(calculationRecord.getOperationType() + " Result");
+        String operationTitle = OperationUtils.getOperationDisplayName(this, calculationRecord.getOperationType()) + " - " + getString(R.string.result);
+        getSupportActionBar().setTitle(operationTitle);
 
         // Set up tab layout
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -114,8 +117,8 @@ public class ResultActivity extends AppCompatActivity {
         TableLayout resultTable = resultView.findViewById(R.id.result_table);
         TextView scalarResultText = resultView.findViewById(R.id.scalar_result_text);
 
-        // Set operation title
-        operationTitleText.setText(calculationRecord.getOperationType());
+        // Sử dụng tên tiếng Việt cho phép toán
+        operationTitleText.setText(OperationUtils.getOperationDisplayName(this, calculationRecord.getOperationType()));
 
         // Display Matrix A
         displayMatrix(calculationRecord.getInputMatrixA(), matrixATable);
@@ -514,20 +517,22 @@ public class ResultActivity extends AppCompatActivity {
     private void onShareClick(View view) {
         // Create share content
         StringBuilder shareContent = new StringBuilder();
-        shareContent.append("Matrix Calculation: ").append(calculationRecord.getOperationType()).append("\n\n");
+        String operationName = OperationUtils.getOperationDisplayName(this, calculationRecord.getOperationType());
+        shareContent.append("Tính toán ma trận: ").append(operationName).append("\n\n");
+
 
         // Add Matrix A
-        shareContent.append("Matrix A:\n");
+        shareContent.append("Ma trận A:\n");
         appendMatrixToString(calculationRecord.getInputMatrixA(), shareContent);
 
         // Add Matrix B if it exists
         if (calculationRecord.hasTwoInputs()) {
-            shareContent.append("\nMatrix B:\n");
+            shareContent.append("\nMa trận B:\n");
             appendMatrixToString(calculationRecord.getInputMatrixB(), shareContent);
         }
 
         // Add result
-        shareContent.append("\nResult:\n");
+        shareContent.append("\nKết quả:\n");
         if (isScalarResult) {
             shareContent.append(scalarResult);
         } else {
@@ -536,24 +541,24 @@ public class ResultActivity extends AppCompatActivity {
 
         // Add SVD results if applicable
         if (calculationRecord.isSVDResult()) {
-            shareContent.append("\nSVD Decomposition: A = U × Σ × V^T\n\n");
+            shareContent.append("\nPhân tích SVD: A = U × Σ × V^T\n\n");
 
-            shareContent.append("U (orthogonal):\n");
+            shareContent.append("U (ma trận trực giao):\n");
             appendMatrixToString(calculationRecord.getMatrixU(), shareContent);
 
-            shareContent.append("\nΣ (singular values):\n");
+            shareContent.append("\nΣ (giá trị kỳ dị):\n");
             appendMatrixToString(calculationRecord.getMatrixS(), shareContent);
 
-            shareContent.append("\nV^T (orthogonal transposed):\n");
+            shareContent.append("\nV^T (ma trận trực giao chuyển vị):\n");
             appendMatrixToString(calculationRecord.getMatrixVT(), shareContent);
 
             // Add singular values list
-            shareContent.append("\nSingular values:\n");
+            shareContent.append("\nGiá trị kỳ dị:\n");
             MatrixModel matrixS = calculationRecord.getMatrixS();
             for (int i = 0; i < Math.min(matrixS.getRows(), matrixS.getColumns()); i++) {
                 double singularValue = matrixS.getValue(i, i);
                 if (Math.abs(singularValue) > 1e-10) {
-                    shareContent.append(String.format("σ%d = %.2f\n", i+1, singularValue));
+                    shareContent.append(String.format(Locale.getDefault(), "σ%d = %.2f\n", i+1, singularValue));
                 }
             }
         }
@@ -561,10 +566,10 @@ public class ResultActivity extends AppCompatActivity {
         // Create share intent
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Matrix Calculation Result");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Kết quả tính toán ma trận");
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareContent.toString());
 
-        startActivity(Intent.createChooser(shareIntent, "Share via"));
+        startActivity(Intent.createChooser(shareIntent, "Chia sẻ qua"));
     }
 
     /**
