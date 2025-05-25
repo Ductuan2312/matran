@@ -410,28 +410,16 @@ public class MatrixInputActivity extends AppCompatActivity {
                     record = OperationModel.determinantWithSteps(matrixA);
                     break;
                 case "EIGENVALUES":
-                    // Chưa có phiên bản với các bước
-                    MatrixModel eigenMatrix = OperationModel.eigenvalues(matrixA);
-                    record = new CalculationRecord("Trị Riêng", matrixA, eigenMatrix);
+                    record = OperationModel.eigenvaluesWithSteps(matrixA);
                     break;
                 case "INVERSE":
                     record = OperationModel.inverseWithSteps(matrixA);
                     break;
                 case "CONVOLUTION":
-                    // Chưa có phiên bản với các bước
-                    MatrixModel convResult = OperationModel.convolution(matrixA, matrixB);
-                    record = new CalculationRecord("Convolution", matrixA, matrixB, convResult);
+                    record = OperationModel.convolutionWithSteps(matrixA, matrixB);
                     break;
                 case "SVD":
-                    // Chưa có phiên bản với các bước
-                    MatrixModel[] svdMatrices = OperationModel.svd(matrixA);
-                    record = new CalculationRecord(
-                            "Phân Tích SVD",
-                            matrixA,
-                            svdMatrices[0], // Ma trận U
-                            svdMatrices[1], // Ma trận S
-                            svdMatrices[2]  // Ma trận V^T
-                    );
+                    record = OperationModel.svdWithSteps(matrixA);
                     break;
                 case "RANK":
                     record = OperationModel.rankWithSteps(matrixA);

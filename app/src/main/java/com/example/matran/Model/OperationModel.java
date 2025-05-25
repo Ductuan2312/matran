@@ -503,6 +503,73 @@ public class OperationModel {
         return result;
     }
 
+    public static CalculationRecord convolutionWithSteps(MatrixModel matrix, MatrixModel kernel) {
+        int resultRows = matrix.getRows() - kernel.getRows() + 1;
+        int resultCols = matrix.getColumns() - kernel.getColumns() + 1;
+
+        if (resultRows <= 0 || resultCols <= 0) {
+            throw new IllegalArgumentException("Kernel size must be smaller than matrix size");
+        }
+
+        MatrixModel result = new MatrixModel(resultRows, resultCols);
+        CalculationRecord record = new CalculationRecord("Convolution", matrix, kernel, result);
+
+        record.addStep("Bước 1: Chuẩn bị tích chập với kernel kích thước " +
+                kernel.getRows() + "x" + kernel.getColumns());
+        record.addStep("Kết quả sẽ có kích thước " +
+                resultRows + "x" + resultCols);
+
+        // Chi tiết cho một vài ví dụ tại các vị trí cụ thể
+        for (int i = 0; i < resultRows && i < 2; i++) {
+            for (int j = 0; j < resultCols && j < 2; j++) {
+                StringBuilder stepDetail = new StringBuilder();
+                stepDetail.append(String.format("Tính kết quả tại vị trí (%d,%d):\n", i, j));
+
+                double sum = 0;
+                for (int ki = 0; ki < kernel.getRows(); ki++) {
+                    for (int kj = 0; kj < kernel.getColumns(); kj++) {
+                        int flippedRowIndex = kernel.getRows() - 1 - ki;
+                        int flippedColIndex = kernel.getColumns() - 1 - kj;
+
+                        double matValue = matrix.getValue(i + ki, j + kj);
+                        double kernValue = kernel.getValue(flippedRowIndex, flippedColIndex);
+                        sum += matValue * kernValue;
+
+                        stepDetail.append(String.format("  Matrix[%d,%d] * Kernel[%d,%d] = %.2f * %.2f = %.2f\n",
+                                i + ki, j + kj, flippedRowIndex, flippedColIndex, matValue, kernValue, matValue * kernValue));
+                    }
+                }
+
+                stepDetail.append(String.format("  Tổng = %.2f", sum));
+                record.addStep(stepDetail.toString());
+                result.setValue(i, j, sum);
+            }
+        }
+
+        if (resultRows > 2 || resultCols > 2) {
+            record.addStep("... Tương tự cho các phần tử còn lại.");
+        }
+
+        // Hoàn thành ma trận kết quả (không hiển thị tất cả các bước)
+        for (int i = 0; i < resultRows; i++) {
+            for (int j = 0; j < resultCols; j++) {
+                if (!(i < 2 && j < 2)) {  // Đã hiển thị chi tiết cho các vị trí này rồi
+                    double sum = 0;
+                    for (int ki = 0; ki < kernel.getRows(); ki++) {
+                        for (int kj = 0; kj < kernel.getColumns(); kj++) {
+                            int flippedRowIndex = kernel.getRows() - 1 - ki;
+                            int flippedColIndex = kernel.getColumns() - 1 - kj;
+                            sum += matrix.getValue(i + ki, j + kj) * kernel.getValue(flippedRowIndex, flippedColIndex);
+                        }
+                    }
+                    result.setValue(i, j, sum);
+                }
+            }
+        }
+
+        record.addStep("Kết quả cuối cùng:", result);
+        return record;
+    }
     /**
      * Calculate rank of a matrix
      * @param matrix input matrix
@@ -837,6 +904,52 @@ public class OperationModel {
         throw new UnsupportedOperationException("SVD for matrices larger than 2x2 is not implemented");
     }
 
+    public static CalculationRecord svdWithSteps(MatrixModel matrix) {
+        MatrixModel[] svdMatrices = svd(matrix); // Sử dụng phương thức hiện có
+
+        CalculationRecord record = new CalculationRecord(
+                "Phân Tích SVD",
+                matrix,
+                svdMatrices[0], // Ma trận U
+                svdMatrices[1], // Ma trận S
+                svdMatrices[2]  // Ma trận V^T
+        );
+
+        record.addStep("Phương pháp phân tích SVD (Singular Value Decomposition):");
+        record.addStep("Mục tiêu: Phân tích ma trận A thành tích U × Σ × V^T, trong đó:");
+        record.addStep("- U là ma trận trực giao có các cột là vector riêng của AA^T");
+        record.addStep("- Σ là ma trận đường chéo chứa các giá trị kỳ dị (singular values)");
+        record.addStep("- V^T là ma trận trực giao chuyển vị có các hàng là vector riêng của A^T·A");
+
+        record.addStep("Tính ma trận A^T·A");
+        MatrixModel atA = OperationModel.multiply(OperationModel.transpose(matrix), matrix);
+        record.addStep("A^T·A =", atA);
+
+        record.addStep("Tính trị riêng và vector riêng của A^T·A");
+        record.addStep("Các giá trị kỳ dị σᵢ là căn bậc hai của trị riêng λᵢ của A^T·A");
+
+        // Hiển thị các giá trị kỳ dị
+        MatrixModel S = svdMatrices[1];
+        StringBuilder singularValues = new StringBuilder("Giá trị kỳ dị σᵢ:\n");
+        for (int i = 0; i < Math.min(S.getRows(), S.getColumns()); i++) {
+            if (Math.abs(S.getValue(i, i)) > 1e-10) {
+                singularValues.append(String.format("σ%d = %.4f\n", i+1, S.getValue(i, i)));
+            }
+        }
+        record.addStep(singularValues.toString());
+
+        record.addStep("Tạo ma trận V từ các vector riêng của A^T·A");
+        record.addStep("V^T =", svdMatrices[2]);
+
+        record.addStep("Tính U = A·V·Σ^(-1)");
+        record.addStep("U =", svdMatrices[0]);
+
+        record.addStep("Kết quả cuối cùng:");
+        record.addStep("A = U × Σ × V^T");
+        record.addStep("phép toán khá dài và phức tạp, bạn chịu khó để hiểu nhé!!");
+
+        return record;
+    }
     /**
      * Calculate eigenvalues of a square matrix
      * @param matrix input square matrix
@@ -897,6 +1010,55 @@ public class OperationModel {
         throw new UnsupportedOperationException("Eigenvalue calculation for matrices larger than 2x2 is not implemented");
     }
 
+    public static CalculationRecord eigenvaluesWithSteps(MatrixModel matrix) {
+        if (matrix.getRows() != matrix.getColumns()) {
+            throw new IllegalArgumentException("Eigenvalues can only be calculated for square matrices");
+        }
+
+        MatrixModel result = eigenvalues(matrix); // Sử dụng phương thức hiện có
+        CalculationRecord record = new CalculationRecord("Trị Riêng", matrix, result);
+
+        // Thêm các bước chi tiết
+        record.addStep("Bước 1: Thiết lập phương trình đặc trưng |A - λI| = 0");
+
+        int n = matrix.getRows();
+        if (n == 2) {
+            double a = matrix.getValue(0, 0);
+            double b = matrix.getValue(0, 1);
+            double c = matrix.getValue(1, 0);
+            double d = matrix.getValue(1, 1);
+
+            record.addStep(String.format("Ma trận A = [[%.2f, %.2f], [%.2f, %.2f]]", a, b, c, d));
+            record.addStep("Bước 2: Tính phương trình đặc trưng");
+            record.addStep(String.format("det([[%.2f - λ, %.2f], [%.2f, %.2f - λ]]) = 0", a, b, c, d));
+            record.addStep(String.format("(%.2f - λ)(%.2f - λ) - %.2f·%.2f = 0", a, d, b, c));
+
+            double trace = a + d;
+            double det = a * d - b * c;
+
+            record.addStep(String.format("λ² - %.2fλ + %.2f = 0", trace, det));
+
+            // Giải phương trình bậc 2
+            record.addStep("Bước 3: Giải phương trình bậc hai để tìm các trị riêng");
+
+            double discriminant = trace * trace - 4 * det;
+            double lambda1 = (trace + Math.sqrt(discriminant)) / 2.0;
+            double lambda2 = (trace - Math.sqrt(discriminant)) / 2.0;
+
+            record.addStep(String.format("Δ = %.2f² - 4·%.2f = %.4f", trace, det, discriminant));
+            record.addStep(String.format("λ₁ = (%.2f + √%.4f)/2 = %.4f", trace, discriminant, lambda1));
+            record.addStep(String.format("λ₂ = (%.2f - √%.4f)/2 = %.4f", trace, discriminant, lambda2));
+        } else {
+            record.addStep("Đối với ma trận " + n + "x" + n + ", phương trình đặc trưng trở nên phức tạp.");
+            record.addStep("Các bước cơ bản bao gồm:");
+            record.addStep("1. Thiết lập phương trình |A - λI| = 0");
+            record.addStep("2. Khai triển định thức để có đa thức bậc " + n + " theo λ");
+            record.addStep("3. Giải phương trình đa thức để tìm các nghiệm λ₁, λ₂, ...");
+        }
+
+        record.addStep("Kết quả: Ma trận đường chéo chứa các trị riêng:", result);
+        return record;
+    }
     /**
      * Calculate Reduced Row Echelon Form (RREF) of matrix
      * @param matrix input matrix
