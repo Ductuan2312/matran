@@ -12,7 +12,10 @@
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/teal_700</item>
         <!-- Customize your theme here. -->
+        <!-- Thêm dòng này để thay đổi màu tab được chọn -->
+        <item name="tabIndicatorHeight">2dp</item> // tăng đọ dày của đường chỉ báo tab
+
     </style>
 </resources>

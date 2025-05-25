@@ -20,7 +20,10 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:tabIndicatorColor="@color/teal_700"
+        app:tabSelectedTextColor="@color/teal_700"
+        app:tabTextColor="#757575">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
@@ -46,7 +49,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
+        app:backgroundTint="@color/teal_700"
         android:contentDescription="@string/share"
-        app:srcCompat="@drawable/ic_share" />
+        app:srcCompat="@drawable/ic_share"
+        app:tint="@color/white"/>
 
 </LinearLayout>
