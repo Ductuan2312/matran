@@ -165,7 +165,9 @@ public class MainActivity extends AppCompatActivity {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Giải Ma Trận");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "Hãy thử ứng dụng Giải Ma Trận - Công cụ tính toán ma trận mạnh mẽ và dễ sử dụng: https://play.google.com/store/apps/details?id=com.example.matran");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "Hãy thử ứng dụng Giải Ma Trận - Công cụ tính toán ma trận mạnh mẽ và dễ sử dụng,bạn có thể tải về tại APKPure vì hiện tại tôi chưa có tiền để đăng lên Play Store :))\n\n" +
+                    "hoặc có thể tải về tại link github release của tôi:https://github.com/Ductuan2312/matran nó nằm ở phần release nhé.\n\n" +"nếu khó quá hãy liên hệ với tôi qua email hoăc zalo:0383943756 nhé.\n\n" +
+                    "hoặc bạn có thể vào youtube của tôi để xem hướng dẫn cài đặt và sử dụng: https://www.youtube.com/@ducktuann" );
             startActivity(Intent.createChooser(shareIntent, "Chia sẻ qua"));
         });
 

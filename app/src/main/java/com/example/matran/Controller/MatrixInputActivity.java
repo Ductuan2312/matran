@@ -193,6 +193,7 @@ public class MatrixInputActivity extends AppCompatActivity {
     /**
      * Create matrix input fields in the table
      */
+    // Trong phương thức createMatrixInputFields của file MatrixInputActivity.java
     private void createMatrixInputFields(int rows, int columns) {
         matrixInputTable.removeAllViews();
 
@@ -205,12 +206,30 @@ public class MatrixInputActivity extends AppCompatActivity {
             for (int j = 0; j < columns; j++) {
                 EditText editText = new EditText(this);
                 editText.setTag("cell_" + i + "_" + j);
-                editText.setHint("0");
-                editText.setText("0");
+                editText.setHint("0");  // Sử dụng hint thay vì text
                 editText.setTextSize(14);
                 editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
                         | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
                         | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+                // Thêm sự kiện OnFocusChangeListener để xử lý khi người dùng nhấp vào ô
+                editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
+                        EditText et = (EditText) v;
+                        if (hasFocus) {
+                            // Khi ô được focus (nhấp vào), kiểm tra nếu giá trị là "0" thì xóa nó
+                            if (et.getText().toString().equals("0")) {
+                                et.setText("");
+                            }
+                        } else {
+                            // Khi ô mất focus, nếu trống thì đặt lại giá trị là "0"
+                            if (et.getText().toString().isEmpty()) {
+                                et.setText("0");
+                            }
+                        }
+                    }
+                });
 
                 TableRow.LayoutParams params = new TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT,
@@ -248,12 +267,27 @@ public class MatrixInputActivity extends AppCompatActivity {
                 EditText editText = new EditText(this);
                 editText.setTag("cell2_" + i + "_" + j);
                 editText.setHint("0");
-                editText.setText("0");
                 editText.setTextSize(14);
                 editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
                         | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
                         | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
 
+                // Thêm sự kiện OnFocusChangeListener
+                editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
+                        EditText et = (EditText) v;
+                        if (hasFocus) {
+                            if (et.getText().toString().equals("0")) {
+                                et.setText("");
+                            }
+                        } else {
+                            if (et.getText().toString().isEmpty()) {
+                                et.setText("0");
+                            }
+                        }
+                    }
+                });
                 TableRow.LayoutParams params = new TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT);
@@ -285,12 +319,27 @@ public class MatrixInputActivity extends AppCompatActivity {
             EditText editText = new EditText(this);
             editText.setTag("constant_" + i);
             editText.setHint("0");
-            editText.setText("0");
             editText.setTextSize(14);
             editText.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
                     | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
                     | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
 
+            // Thêm sự kiện OnFocusChangeListener
+            editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    EditText et = (EditText) v;
+                    if (hasFocus) {
+                        if (et.getText().toString().equals("0")) {
+                            et.setText("");
+                        }
+                    } else {
+                        if (et.getText().toString().isEmpty()) {
+                            et.setText("0");
+                        }
+                    }
+                }
+            });
             TableRow.LayoutParams params = new TableRow.LayoutParams(
                     TableRow.LayoutParams.WRAP_CONTENT,
                     TableRow.LayoutParams.WRAP_CONTENT);
@@ -350,7 +399,7 @@ public class MatrixInputActivity extends AppCompatActivity {
                     EditText cell = (EditText) row.getChildAt(j);
                     String value = cell.getText().toString();
                     if (TextUtils.isEmpty(value) || value.equals("-")) {
-                        matrix.setValue(i, j, 0);
+                        matrix.setValue(i, j, 0);  // Giá trị mặc định cho ô trống
                     } else {
                         matrix.setValue(i, j, Double.parseDouble(value));
                     }
