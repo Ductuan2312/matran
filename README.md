@@ -5,8 +5,10 @@
 ## Tổng Quan
 
 **Ma Trận** là một ứng dụng Android mạnh mẽ và trực quan, được thiết kế để hỗ trợ tính toán ma trận phức tạp với giao diện người dùng tinh tế. Ứng dụng tích hợp các thuật toán đại số tuyến tính hiện đại, cùng với hiển thị chi tiết các bước tính toán, giúp người dùng không chỉ nhận kết quả mà còn hiểu rõ quá trình tính toán.
-đã có trên APKPure:https://apkpure.com/p/com.example.matran
-trang giới thiệu các cá nhân và các app phát triển:https://ductuan.studio/
+
+-app đã có trên APKPure:https://apkpure.com/p/com.example.matran
+-trang giới thiệu các cá nhân và các app phát triển:https://ductuan.studio/
+
 ## Tính Năng Nổi Bật
 
 ### 1. Phép Toán Ma Trận Đầy Đủ
